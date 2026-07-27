@@ -3,46 +3,63 @@ using UnityEngine.AI;
 
 public class NPCBrain : MonoBehaviour
 {
-    
-    public enum NPCState { Walking, Stopped }
+    // Our updated states
+    public enum NPCState { Roaming, Stopped }
     public NPCState currentState;
 
-    
-    public Transform myDestination; 
+    // distance the NPC is allowed to wander from their current spot
+    public float roamRadius = 15f; 
     
     private NavMeshAgent agent;
 
     void Start()
     {
-        // grab the NavMeshAgent 
         agent = GetComponent<NavMeshAgent>();
+        currentState = NPCState.Roaming;
         
-        // start the game in the walking state
-        currentState = NPCState.Walking; 
+        // first random spot when the game starts
+        GoToRandomPoint(); 
     }
 
     void Update()
     {
-        //checks what state we are in every frame
         switch (currentState)
         {
-            case NPCState.Walking:
+            case NPCState.Roaming:
                 agent.isStopped = false;
-                // Tell the agent to walk to the target
-                if (myDestination != null)
+                
+                // check if the NPC has arrived at their destination (within 0.5 units)
+                // helps tell if they aren't currently calculating a path
+                if (!agent.pathPending && agent.remainingDistance < 0.5f)
                 {
-                    agent.SetDestination(myDestination.position);
+                    GoToRandomPoint(); // Pick a new random spot!
                 }
                 break;
 
             case NPCState.Stopped:
-                // Instantly freeze the agent in place
                 agent.isStopped = true; 
                 break;
         }
     }
 
-    //call this later from your Raycast script to freeze the NPCs
+    // idk what this function that does the math to find a valid spot on the blue NavMesh
+    void GoToRandomPoint()
+    {
+        // pick a completely random point inside a virtual sphere
+        Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
+        
+        // add our NPC's current position to it so the sphere centers around them
+        randomDirection += transform.position; 
+        
+        NavMeshHit hit;
+        // ask Unity to find the closest valid blue NavMesh spot near that random point
+        if (NavMesh.SamplePosition(randomDirection, out hit, roamRadius, 1))
+        {
+            // 4. Tell the agent to go there
+            agent.SetDestination(hit.position);
+        }
+    }
+    
     public void FreezeNPC()
     {
         currentState = NPCState.Stopped;
