@@ -1655,7 +1655,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
   currentState: 0
-  roamRadius: 15
+  roamRadius: 30
 --- !u!195 &383698930
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -3802,7 +3802,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
   currentState: 0
-  roamRadius: 15
+  roamRadius: 30
 --- !u!195 &812273257
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -5005,7 +5005,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
   currentState: 0
-  roamRadius: 15
+  roamRadius: 30
 --- !u!195 &1103954198
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -6111,7 +6111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
   currentState: 0
-  roamRadius: 15
+  roamRadius: 30
 --- !u!195 &1261777199
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -6797,7 +6797,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
   currentState: 0
-  roamRadius: 15
+  roamRadius: 30
 --- !u!195 &1371939341
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -7029,7 +7029,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
   currentState: 0
-  roamRadius: 15
+  roamRadius: 30
 --- !u!195 &1544155997
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -8249,7 +8249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
   currentState: 0
-  roamRadius: 15
+  roamRadius: 30
 --- !u!195 &1733606513
 NavMeshAgent:
   m_ObjectHideFlags: 0
