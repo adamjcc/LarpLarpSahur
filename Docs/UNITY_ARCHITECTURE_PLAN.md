@@ -1,5 +1,12 @@
 # Unity Architecture Plan — Road Safety Reconstruction Game
 
+> **⚠️ SUPERSEDED BY [`BUILD_PLAN.md`](BUILD_PLAN.md).**
+> That document is the authoritative plan and reflects the final agreed design
+> (car + pedestrian, night, post-crash free roam, dialogue-triggered POV replays).
+> This file is kept because its background explanations of Cinemachine, NavMesh,
+> determinism and the audit of the original scripts are still accurate and useful.
+> Where the two disagree, `BUILD_PLAN.md` wins.
+
 Written 30 July 2026. Target: I3E / STLD / 3RT deliverables due 14 Aug 2026.
 This document covers **only the Unity side** (mostly I3E, with notes where STLD/3RT touch it).
 
