@@ -166,84 +166,118 @@ and it is the only version of this that finishes by 14 August.
 
 # PART C — Numbers you must confirm
 
-**Read this table before we start Part 2 of the build.** These are my recommendations with
-reasoning. Every one of them will be a field in the Inspector so you can change it without
-touching code — but the level layout depends on them, so Darryl needs them settled early.
+**Read this before we start Part 2.** These are recommendations with reasoning. All of them
+are Inspector fields you can change without touching code — but the level layout depends on
+them, so Darryl needs them settled early.
+
+## C.0 You do not place the actors by hand
+
+This is the important bit, and it removes almost all the guesswork.
+
+You drop **one empty GameObject called `ImpactMarker`** at the spot where the crash happens.
+Each actor then works out its own starting position like this:
+
+```
+how far along my path is the ImpactMarker?          →  say 118.0 m
+how far do I travel in impactTime seconds?          →  13.9 m/s × 7 s = 97.3 m
+so I start at                                       →  118.0 − 97.3 = 20.7 m along my path
+```
+
+Move the marker, change the car's speed, redraw the road — everything re-solves on its own.
+
+**And if the road is too short, Unity tells you.** If that subtraction comes out negative,
+the Console prints: `Path_Vehicle is 12.4 m too short before the ImpactMarker.` No guessing,
+no cars spawning in mid-air.
 
 ## C.1 The core timing
 
 | Setting | Recommended | Why |
 |---|---|---|
-| `impactTime` | **8.0 s** | Long enough for the bird's-eye shot to establish both road users. |
-| Total sim length | **11.0 s** | 8s to impact + 3s of aftermath settling. |
-| Free-roam snapshot | **impact + 2.0 s** | Car has stopped, she's back on her feet, dust settled. |
-| Intervene lead time | **5.0 s** | You asked for this. It's also enough road to matter. |
-| Intervene `TimeScale` | **0.1×** | 5 scenario seconds × 10 = **50 real seconds** of play. |
-| POV replay window | **impact − 6.0 s → impact + 1.0 s** | 7 seconds. Long enough to read the mistake, short enough not to bore. |
+| `impactTime` | **7.0 s** | Enough for the bird's-eye to show the car approach, turn, and hit. Purely how much lead-in the opening shot has — change it freely. |
+| Total sim length | **10.0 s** | 7 s to impact + 3 s of aftermath settling. |
+| Free-roam snapshot | **impact + 2.0 s** | Car stopped, she's back on her feet, dust settled. |
+| Intervene lead time | **3.0 s** | Shortened from 5 s so the road can be shorter. See C.2. |
+| Intervene `TimeScale` | **0.06×** | 3 scenario seconds ÷ 0.06 = **50 real seconds** of play. |
+| POV replay window | **impact − 5.0 s → impact + 1.0 s** | 6 seconds. Long enough to read the mistake, short enough not to drag. |
+
+**The on-screen countdown shows scenario seconds, not real seconds.** It reads
+`3.00 → 0.00`, to two decimal places, crawling downward. At 0.06× the second decimal changes
+about six times a second, so it visibly ticks instead of looking frozen. The player never
+sees the number 50 — that's just how long it takes in the real world.
 
 ## C.2 Speeds and distances
 
 | Setting | Recommended | Why |
 |---|---|---|
-| Posted speed limit | **40 km/h** | Night, residential, near a crossing. Makes speeding legible. |
-| Car speed | **55 km/h = 15.3 m/s** | Clearly over, not cartoonish. Speedometer reads 55. |
-| Pedestrian walk | **1.2 m/s** | Normal walking is ~1.4. Phone users walk measurably slower — a real finding, and worth putting in the debrief. |
+| Posted speed limit | **40 km/h** | Night, residential, near a crossing. Makes speeding legible on the speedometer. |
+| Car speed | **50 km/h = 13.9 m/s** | A real urban speed, clearly over a 40 limit, and it keeps the road short. |
+| Pedestrian walk | **1.2 m/s** | Normal walking is ~1.4. Phone users walk measurably slower — a real research finding, worth stating in the debrief. |
 | Player walk | 4.0 m/s (Starter Assets default) | Already set. Don't change it yet. |
 | Road carriageway | **7.0 m** (2 lanes × 3.5 m) | Standard. |
-| NPC interact range | **12 m** | You picked this. |
+| NPC interact range | **12 m** | Your call, from earlier. |
 | Prop interact range | **3.5 m** | Phones, buttons, headphones. |
 
-### The one equation that matters for level design
+### How much road you actually need
+
+Only one stretch of road has a hard length requirement: **the straight run between the end of
+the turn and the impact point.** That's where the whole Intervene phase happens.
 
 ```
-distance the car starts behind the impact point  =  car speed  ×  intervene lead time
-                                                 =  15.3 m/s   ×  5.0 s
-                                                 =  76.5 metres
+straight road needed  =  car speed  ×  intervene lead time
 ```
 
-**So when the Intervene phase begins, the car is 76 metres away from you.** That is not a
-mistake — it is what 55 km/h looks like over five seconds — but it means:
+| Lead time | TimeScale | Real seconds of play | Straight needed after the turn |
+|---|---|---|---|
+| **3.0 s** | **0.06** | **50 s** | **~42 m**  ← recommended |
+| 3.5 s | 0.07 | 50 s | ~49 m |
+| 4.0 s | 0.08 | 50 s | ~56 m |
+| 5.0 s | 0.10 | 50 s | ~70 m |
 
-1. Darryl must build **at least 100 m of straight road** approaching the crossing. If the
-   road is only 40 m long, the car will spawn in mid-air past the end of it.
-2. You do not have to run 76 m. The car is coming *toward* you at 1.53 m/s (that's
-   15.3 × 0.1), and you walk at 4 m/s, so you close the gap at 5.53 m/s together —
-   **about 14 real seconds** to meet it, out of your 50.
+Every row gives the same 50 seconds of play (`realSeconds = leadTime ÷ TimeScale`). Pick the
+row that matches the road Darryl can actually build.
 
-A rough budget for the 50 seconds: 2s to reach her, 12s inside her POV, 14s to meet the car,
-15s inside his POV = 43s. It fits, with 7 seconds of slack. **If playtesting says it's tight,
-drop `TimeScale` from 0.1 to 0.08 and you get 62 seconds instead.** One number, no code change.
+**Design rule from the turn:** the car must *finish* its turn at least `leadTime` before
+impact. Otherwise the Intervene phase opens with the car mid-corner, and a car cornering at
+50 km/h looks ridiculous. Everything before the straight is only ever seen in the bird's-eye
+shot, so it can be as long or short as looks good.
+
+**You don't have to run 42 m.** The car is coming toward you at 0.83 m/s (13.9 × 0.06) while
+you walk at 4, so you close the gap together in about **9 real seconds** out of your 50.
+Rough budget: 2 s to reach her, 12 s in her POV, 9 s to meet the car, 15 s in his POV = 38 s,
+with 12 s of slack. If playtesting feels tight, drop `TimeScale` to 0.05 and you get 60 s.
+
+**Optional, for later:** the car can take a speed *curve* instead of one constant — slower
+through the corner, accelerating down the straight. It's an `AnimationCurve` field you draw
+in the Inspector. I'll leave the hook in from Part 2 but default it off; adding it changes
+nothing else.
 
 ## C.3 The scene geometry
 
-I'll place the crash at the world origin so the maths stays readable:
+The crash sits at the world origin so the numbers stay readable. Matching your sketch, the
+car comes in along the top road heading **−X**, turns south, then runs **−Z** to the impact.
 
 ```
-                          ↑ +Z
-                          │
-        ══════════════════╪══════════════════   far kerb   (z = +3.5)
-                          │
-   car ──────────────────►█◄── IMPACT POINT (0,0,0)          road (7 m wide)
-   travelling +X          │
-        ══════════════════╪══════════════════   near kerb  (z = −3.5)
-                          │
-                          ▲  pedestrian walking +Z
-                          │
-                     she starts here at t=0  (z = −9.6)
+        ══════════════════════════════════════════  main road
+                                       ↰   ◄── CAR enters here
+                                       │
+                                       │   ← the turn completes ~42 m before impact
+                                       │
+                                       │      side road, 7 m wide
+                                       │
+                                       ▼
+        ═══════════════════════════════█═══════  ◄── IMPACT POINT = (0, 0, 0)
+                                       ▲            put ImpactMarker here
+                                       │
+                                  pedestrian walking toward it
 ```
 
-At any scenario time `t`:
+Exact waypoint coordinates come from Darryl's layout — you no longer need to compute them,
+because of C.0. All you have to guarantee is that **each path is long enough before the
+marker**, and Unity will tell you if it isn't.
 
-| | position at time `t` | at t = 0 | at t = 3.0 (Intervene start) | at t = 8.0 (impact) |
-|---|---|---|---|---|
-| Car | `x = −(8 − t) × 15.3` | x = −122 | x = −76.5 | x = 0 |
-| Pedestrian | `z = −(8 − t) × 1.2` | z = −9.6 | z = −6.0 | z = 0 |
-
-She steps off the near kerb (z = −3.5) at **t = 5.08 s** — about three seconds before impact.
-
-Player spawn for Free Roam and Intervene: **(6, 0, −6)** — on the pavement, corner of the
-crossing, looking toward the impact point. Close to her (about 6 m), and facing the direction
-the car comes from.
+Player spawn for Free Roam and Intervene: on the pavement roughly **6 m from the impact
+point**, facing the direction the car comes from. Close to her, so the first thing you find
+is the pedestrian, and the car arrives as a growing threat.
 
 ## C.4 Outcome grading
 
@@ -435,42 +469,70 @@ window, above all the imported asset folders.
 
 **Tags:** `NPC` and `Vehicle` already exist. Add `Player` if it isn't set on your capsule.
 
-**Physics matrix** (Project Settings → Physics): uncheck `Interactable` × `Interactable`,
-and `Interactable` × everything except nothing — the interaction colliders are triggers used
-only for raycasts, they should never physically collide with anything.
+**Physics collision matrix: skip it.** It was an optimisation, not a requirement — trigger
+colliders never physically push anything anyway. If we ever see a trigger firing twice, I'll
+filter it in code instead. Cross it off your list.
 
 ## E.3 The pedestrian prefab
 
+### First — the rule for what becomes its own GameObject
+
+A **GameObject** is a container. **Components** (a mesh, a collider, a script) are bolted onto
+it. **Parenting** means when the parent moves, the child moves with it. So:
+
+> **If the thing already has a mesh you can see** — headphones, phone, umbrella, a dashboard
+> button — put the collider and the scripts **directly on that same GameObject**. One object,
+> not two.
+>
+> **Only when there is nothing to see** do you create a separate empty GameObject: the
+> "talk to her" volume around her body, the big volume around the car, and camera anchors.
+
+On the pedestrian that means exactly **two** objects you create by hand. Everything else is
+components added to something that already exists.
+
 ```
-Pedestrian_Victim                       layer: Pedestrian
-│   PedestrianVictim.cs
-│   CapsuleCollider          ← physics body, so the car's ImpactSensor can detect her
-│   Animator
+Pedestrian_Victim                      ← PREFAB ROOT (you create). layer: Pedestrian
+│      PedestrianVictim.cs
+│      CapsuleCollider       ← physics body, so the car's ImpactSensor can detect her
+│      Animator
 │
-├── Character 03 (Hodaart mesh + armature)
-│   └── mixamorig:Hips → ... → mixamorig:Head
-│       ├── Headphones (mesh)                      ← a simple modelled band, or a cube for now
-│       ├── Interact_Headphones                    layer: Interactable
-│       │      SphereCollider (isTrigger, r≈0.28)
-│       │      HazardInteractable  (id=Headphones, access=FromOutsideOnly)
-│       │      Highlighter
-│       ├── POV_Locked (empty)                     ← child of head bone, rotates with her
-│       └── (right hand bone)
-│           ├── Phone (mesh)
-│           └── Interact_Phone                     layer: Interactable
-│                  BoxCollider (isTrigger)
-│                  HazardInteractable (id=Phone, access=FromPovOnly)
+├── Character 03             ← the Hodaart model, dragged in as-is
+│   └── mixamorig:Hips
+│       ├── ... → mixamorig:Head
+│       │   ├── Headphones           ← MESH. Add to it: SphereCollider (isTrigger),
+│       │   │                           HazardInteractable (Headphones, FromOutsideOnly),
+│       │   │                           Highlighter.        layer: Interactable
+│       │   └── POV_Locked           ← ✦ EMPTY you create. Rotates with her head.
+│       │                               Used for the locked free-roam replay.
+│       └── ... → mixamorig:RightHand
+│           ├── Phone                ← MESH. Add: BoxCollider (isTrigger),
+│           │                           HazardInteractable (Phone, FromPovOnly),
+│           │                           Highlighter.        layer: Interactable
+│           └── Umbrella             ← MESH. Same treatment. Red herring, access = Both.
 │
-├── Interact_Body                        layer: Interactable
-│      CapsuleCollider (isTrigger) — feet to NECK ONLY, must not enclose the head
+├── Interact_Body            ← ✦ EMPTY you create. Nothing to see, so it needs its own object.
+│      CapsuleCollider (isTrigger) — from her FEET to her NECK. Must NOT enclose the head.
 │      NpcSubject (subject = Pedestrian)
-│      Highlighter
+│      Highlighter           layer: Interactable
 │
-├── POV_Free (empty)                     ← FollowPositionOnly targeting the head bone
-│   └── CAM_PedestrianPOV_Free           CinemachineCamera + PovLook
-│
-└── Umbrella + Interact_Umbrella         layer: Interactable, red herring, access=Both
+└── POV_Free                 ← ✦ EMPTY you create. FollowPositionOnly → target = head bone.
+    └── CAM_PedestrianPOV_Free       CinemachineCamera + PovLook
 ```
+
+**The collider trick that makes your headphones idea work:** `Physics.Raycast` returns the
+**nearest** hit. Her body capsule stops at the neck; her head has its own small sphere. So
+aiming at her head hits the sphere (→ headphones) and aiming anywhere else hits the capsule
+(→ talk to her). If the capsule is left at its default full height it swallows the head and
+you will never be able to click the headphones.
+
+**Why two POV anchors:**
+- `POV_Locked` is a child of the head **bone**, so it turns as she turns. Used for the
+  free-roam replay — the camera is stuck looking down at her phone and **you cannot look up
+  at the car.** That is the whole narrative point of the shot.
+- `POV_Free` copies only her head *position*, never her rotation, so mouse-look on top of it
+  is smooth. Used during Intervene, where you need to look down at the phone and back up.
+  Parent a look-around camera straight to an animated bone and the animation fights the
+  mouse — it's unusable.
 
 **The collider trick that makes your headphones idea work:** the body capsule stops at the
 neck; the head has its own sphere. `Physics.Raycast` returns the **nearest** hit, so aiming
@@ -591,14 +653,16 @@ plus a throwaway `TestActor` that just follows a path.
 `InterventionState`, `HazardId`.
 
 **What you do in Unity:**
-1. **Confirm the Part C numbers with me first.**
-2. Build `Path_Vehicle`: waypoints along the X axis from x = −130 to x = +20, at z = −1.75
-   (centre of the near lane). Just 3 waypoints is fine — it's a straight road.
-3. Build `Path_Pedestrian`: waypoints along the Z axis from z = −12 to z = +6, at x = 0.
+1. Create an empty called `ImpactMarker` at (0, 0, 0). This is the single point everything
+   else is measured from.
+2. Build `Path_Vehicle` — waypoints coming down the side road, **through** the marker and a
+   bit past it. Add the corner if you want; the turn is just two more waypoints.
+3. Build `Path_Pedestrian` — waypoints crossing the road, through the marker and past it.
 4. A Capsule for her (`PedestrianVictim` + CapsuleCollider), a Cube for the car
    (`IncidentVehicle` + a child cube with a trigger BoxCollider + `ImpactSensor`).
    **No character models yet. Grey shapes only.** Art comes much later.
-5. Set every number from the Part C table.
+5. Set the speeds and `impactTime` from the Part C table. **You do not position the actors** —
+   they place themselves. If a path is too short, the Console will say so by exactly how much.
 
 **Test:**
 - ✅ The impact time printed in the Console is the same to two decimal places, ten runs in a row.
@@ -866,10 +930,11 @@ it, and make her walking speed (1.2 m/s vs a normal 1.4) one of the stated findi
 
 # WHAT I NEED FROM YOU BEFORE PART 2
 
-1. Sign off the numbers in **Part C** — especially `impactTime = 8s`, car at 55 km/h, and
-   whether **100 m of approach road** works for the level Darryl is planning.
+1. Pick a row from the road-length table in **C.2**. The recommended row needs about **42 m
+   of straight road** between the end of the car's turn and the impact point. Check that
+   against Darryl's layout.
 2. Confirm the outcome rule in **C.4** (4/4 = prevented, 3/4 = near miss, ≤2 = crash).
-3. Tell me which Hodaart character is the pedestrian and which is the driver, so the prefabs
-   get built with the right ones.
+3. Tell me which Hodaart character is the pedestrian and which is the driver (they're
+   numbered 01–10), so the prefabs get built with the right ones from the start.
 
-Parts 0 and 1 don't depend on any of that, so I can start on those immediately.
+Parts 0 and 1 don't depend on any of that, so those go ahead now.
