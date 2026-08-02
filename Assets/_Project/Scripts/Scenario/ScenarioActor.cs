@@ -41,6 +41,13 @@ public abstract class ScenarioActor : MonoBehaviour
         ResetToStart();
     }
 
+    /// Controls the order actors are ticked within a single step. Lower goes first.
+    ///
+    /// This matters for the ImpactDetector: it has to run AFTER the car and the pedestrian
+    /// have both moved this step, otherwise it measures the gap between them using
+    /// last step's positions.
+    public virtual int TickOrder => 0;
+
     /// Called once per fixed simulation step by the ScenarioRunner.
     /// dt  = always the same fixed amount (1/60 s). Never a variable frame time.
     /// now = seconds since the scenario started.

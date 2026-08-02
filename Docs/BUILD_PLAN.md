@@ -279,17 +279,39 @@ Player spawn for Free Roam and Intervene: on the pavement roughly **6 m from the
 point**, facing the direction the car comes from. Close to her, so the first thing you find
 is the pedestrian, and the car arrives as a growing threat.
 
-## C.4 Outcome grading
+## C.4 Outcome grading — AGREED RULE
 
-| Hazards addressed | What happens on screen | Grade |
+There are only **two endings to author**, and everything else is per-hazard dressing on top
+of them:
+
+> **The collision is avoided only when ALL FOUR hazards are fixed.**
+> **Every hazard the player fixes always shows its effect, crash or no crash.**
+
+| Hazards fixed | What happens on screen | Grade |
 |---|---|---|
-| 4 / 4 | She stops at the kerb, car slows with lights on. No contact. | **Excellent** |
-| 3 / 4 | Car stops hard with a screech, she flinches back. Near miss. | **Pass** |
-| 0–2 / 4 | Collision, same as before. | **Try again** |
+| 4 / 4 | She stops at the kerb. Car brakes with headlights on. **No contact.** | **Excellent** |
+| 3 / 4 | **Crash still happens**, but carrying whatever the player did fix. | **Pass** |
+| 0–2 / 4 | **Crash still happens**, carrying whatever the player did fix. | **Try again** |
 
-One integer comparison. Predictable for a VIVA demo, and every hazard still has a *visible*
-individual effect the moment you apply it (phone goes away, lights come on) so the causality
-is never invisible.
+So a player who fixed only the car's hazards watches the crash happen **with the headlights
+on and the car moving noticeably slower** — and she still walks out in front of it, because
+she never looked up. A player who fixed only her hazards watches the same crash with **no
+phone and no headphones on her** — and it still happens, because he was speeding in the dark.
+
+That is a far better lesson than a pass/fail score, and it's the reason this rule is better
+than the count-threshold I originally proposed. Both people had to change.
+
+### The trap this created, and how it's solved
+
+"Braking makes the car slower but it still crashes" is not free. A slower car covers less
+ground, so it would arrive **late** and miss her by accident.
+
+The fix is that `PathScenarioActor` back-solves the start position from the actor's **actual**
+speed. A braked car simply starts closer to the junction and still reaches the marker at
+exactly `impactTime`. **Braking changes the severity, never the timing.**
+
+Practically: `IncidentVehicle.PlannedSpeedToImpact` returns `brakedSpeed` when the player has
+applied that intervention, and the base class does the rest.
 
 > **⚠️ CONFIRM BEFORE PART 2:** every number in C.1, C.2 and C.4. Especially `impactTime`,
 > car speed, and whether 100 m of approach road is realistic for Darryl's layout. If the road

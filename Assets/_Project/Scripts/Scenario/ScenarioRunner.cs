@@ -40,7 +40,14 @@ public class ScenarioRunner : MonoBehaviour
     /// Actors call this themselves in their Start(). You don't wire it up by hand.
     public void Register(ScenarioActor actor)
     {
-        if (actor != null && !actors.Contains(actor)) actors.Add(actor);
+        if (actor == null || actors.Contains(actor)) return;
+
+        actors.Add(actor);
+
+        // Keep the list sorted so things like the ImpactDetector always run after the
+        // car and the pedestrian have moved. Sorting on every registration is fine —
+        // it happens a handful of times at startup and never again.
+        actors.Sort((a, b) => a.TickOrder.CompareTo(b.TickOrder));
     }
 
     private void Update()
