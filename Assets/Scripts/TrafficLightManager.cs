@@ -2,49 +2,91 @@ using UnityEngine;
 
 public class TrafficLightManager : MonoBehaviour
 {
-    [Header("Stop Line Colliders")]
-    [Tooltip("Invisible walls for North/South traffic")]
-    public GameObject[] northSouthStopLines; 
-    
-    [Tooltip("Invisible walls for East/West traffic")]
-    public GameObject[] eastWestStopLines;   
+    [Header("Visual Controllers")]
+    public TrafficLightVisual[] northSouthLights;
+    public TrafficLightVisual[] eastWestLights;
 
-    [Header("Timing")]
-    public float greenLightDuration = 7f;
-    
-    private float timer;
-    private bool isNorthSouthGreen = true;
+    [Header("Cycle Timings")]
+    public float greenTime = 5f;
+    public float yellowTime = 2f;
+    public float allRedClearTime = 1f;
+
+    private float currentTimer;
+    private int trafficState = 0;
 
     void Start()
     {
-        timer = greenLightDuration;
-        UpdateLights();
+        // Force the very first state the moment the game hits Play
+        SetTrafficState(0);
     }
 
     void Update()
     {
-        timer -= Time.deltaTime;
-        
-        if (timer <= 0)
+        // Manually tick down the clock every frame
+        currentTimer -= Time.deltaTime;
+
+        // When the timer hits zero, move to the next phase
+        if (currentTimer <= 0f)
         {
-            isNorthSouthGreen = !isNorthSouthGreen;
-            timer = greenLightDuration;
-            UpdateLights();
+            trafficState++;
+            
+            // If we run out of states, loop back to the beginning
+            if (trafficState > 5) 
+            {
+                trafficState = 0;
+            }
+
+            SetTrafficState(trafficState);
         }
     }
 
-    void UpdateLights()
+    // This handles exactly what the lights should do in every phase
+    void SetTrafficState(int state)
     {
-        // When North/South is green, turn OFF their walls (so cars can drive)
-        foreach (var line in northSouthStopLines)
+        switch (state)
         {
-            line.SetActive(!isNorthSouthGreen);
+            case 0: // PHASE 0: N/S Green, E/W Red
+                SetLightGroup(northSouthLights, TrafficLightVisual.LightColor.Green);
+                SetLightGroup(eastWestLights, TrafficLightVisual.LightColor.Red);
+                currentTimer = greenTime;
+                break;
+                
+            case 1: // PHASE 1: N/S Yellow
+                SetLightGroup(northSouthLights, TrafficLightVisual.LightColor.Yellow);
+                currentTimer = yellowTime;
+                break;
+                
+            case 2: // PHASE 2: All Red
+                SetLightGroup(northSouthLights, TrafficLightVisual.LightColor.Red);
+                currentTimer = allRedClearTime;
+                break;
+                
+            case 3: // PHASE 3: E/W Green, N/S Red
+                SetLightGroup(eastWestLights, TrafficLightVisual.LightColor.Green);
+                currentTimer = greenTime;
+                break;
+                
+            case 4: // PHASE 4: E/W Yellow
+                SetLightGroup(eastWestLights, TrafficLightVisual.LightColor.Yellow);
+                currentTimer = yellowTime;
+                break;
+                
+            case 5: // PHASE 5: All Red
+                SetLightGroup(eastWestLights, TrafficLightVisual.LightColor.Red);
+                currentTimer = allRedClearTime;
+                break;
         }
+    }
 
-        // When North/South is green, turn ON East/West walls (so cross-traffic brakes)
-        foreach (var line in eastWestStopLines)
+    // Helper function to turn on the correct bulbs
+    void SetLightGroup(TrafficLightVisual[] lightGroup, TrafficLightVisual.LightColor color)
+    {
+        foreach (var light in lightGroup)
         {
-            line.SetActive(isNorthSouthGreen);
+            if (light != null) 
+            {
+                light.SetLight(color);
+            }
         }
     }
 }
