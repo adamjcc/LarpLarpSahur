@@ -24,6 +24,11 @@ public class ScenarioDebugKeys : MonoBehaviour
 
     [Header("Display")]
     [SerializeField] private bool showOnScreen = true;
+    [SerializeField] private int fontSize = 22;
+
+    // [ and ] step through these instead of nudging by 0.02, which took 47 presses
+    // to get from 1.0 down to 0.06.
+    private static readonly float[] speedPresets = { 0.02f, 0.06f, 0.1f, 0.25f, 0.5f, 1f, 2f };
 
     private GUIStyle style;
 
@@ -63,20 +68,39 @@ public class ScenarioDebugKeys : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha3)) runner.SeekTo(settings.InterveneStartTime);
             if (Input.GetKeyDown(KeyCode.Alpha4)) runner.SeekTo(settings.FreeRoamTime);
 
-            // Dry run of what the real Intervene phase will do in Part 6
+            // Dry run of what the real Intervene phase does. This is the key that sets
+            // the rewind, the slow motion AND play all at once — the number keys only seek.
             if (Input.GetKeyDown(KeyCode.I))
             {
                 runner.SeekTo(settings.InterveneStartTime);
                 runner.SetTimeScale(settings.interveneTimeScale);
                 runner.Play();
+
+                Debug.Log($"<color=cyan>[Intervene mode]</color> rewound to " +
+                          $"t={settings.InterveneStartTime:F2}s, timeScale={settings.interveneTimeScale:F2} " +
+                          $"({settings.InterveneRealSeconds:F0} real seconds of play)");
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
-            runner.SetTimeScale(Mathf.Max(0.02f, runner.TimeScale - 0.02f));
+        if (Input.GetKeyDown(KeyCode.LeftBracket)) StepSpeed(-1);
+        if (Input.GetKeyDown(KeyCode.RightBracket)) StepSpeed(+1);
+    }
 
-        if (Input.GetKeyDown(KeyCode.RightBracket))
-            runner.SetTimeScale(Mathf.Min(2f, runner.TimeScale + 0.02f));
+    /// Jump to the next or previous speed preset.
+    private void StepSpeed(int direction)
+    {
+        // find whichever preset we're closest to right now
+        int nearest = 0;
+        float bestGap = float.MaxValue;
+
+        for (int i = 0; i < speedPresets.Length; i++)
+        {
+            float gap = Mathf.Abs(speedPresets[i] - runner.TimeScale);
+            if (gap < bestGap) { bestGap = gap; nearest = i; }
+        }
+
+        int next = Mathf.Clamp(nearest + direction, 0, speedPresets.Length - 1);
+        runner.SetTimeScale(speedPresets[next]);
     }
 
     private void OnGUI()
@@ -88,28 +112,40 @@ public class ScenarioDebugKeys : MonoBehaviour
         {
             style = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 16,
+                fontSize = fontSize,
                 normal = { textColor = Color.white }
             };
         }
 
+        float lineHeight = fontSize + 8;
+        float y = 10f;
         string state = runner.IsPlaying ? "PLAYING" : "PAUSED";
 
-        GUI.Label(new Rect(12, 10, 900, 24),
-            $"ScenarioTime  {runner.ScenarioTime:F2} s      " +
-            $"TimeScale  {runner.TimeScale:F2}      {state}      " +
-            $"Actors: {runner.ActorCount}", style);
+        GUI.Label(new Rect(12, y, 1400, lineHeight),
+            $"t = {runner.ScenarioTime:F2}s      " +
+            $"speed x{runner.TimeScale:F2}      {state}      " +
+            $"actors {runner.ActorCount}", style);
+        y += lineHeight;
 
-        string impact = "IMPACT: none yet";
-        if (impactDetector != null && impactDetector.HasImpacted)
-        {
-            impact = $"IMPACT at {impactDetector.ImpactedAtTime:F2} s";
-        }
+        string impact = impactDetector != null && impactDetector.HasImpacted
+            ? $"IMPACT at {impactDetector.ImpactedAtTime:F2}s"
+            : "IMPACT: none yet";
 
-        GUI.Label(new Rect(12, 32, 900, 24), impact, style);
+        GUI.Label(new Rect(12, y, 1400, lineHeight), impact, style);
+        y += lineHeight;
 
-        GUI.Label(new Rect(12, 54, 900, 24),
-            "P play/pause   R reset   1 manual   2 impact   3 intervene   4 aftermath   " +
-            "I intervene-mode   [ ] speed", style);
+        GUI.Label(new Rect(12, y, 1400, lineHeight),
+            "P play/pause    R reset    1 manual    2 impact    3 intervene    4 aftermath",
+            style);
+        y += lineHeight;
+
+        // Called out on its own line, because it is the only key that changes the SPEED.
+        // The number keys just move the clock.
+        string interveneHint = settings != null
+            ? $"I = intervene mode  (rewind + slow to x{settings.interveneTimeScale:F2} + play)"
+            : "I = intervene mode  (NO ScenarioSettings ASSIGNED)";
+
+        GUI.Label(new Rect(12, y, 1400, lineHeight),
+            interveneHint + "        [ ] cycle speed presets", style);
     }
 }
