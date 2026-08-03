@@ -25,6 +25,10 @@ public class ImpactDetector : ScenarioActor
 
     [SerializeField] private bool logToConsole = true;
 
+    /// Set while the director is running a silent dry-run to predict the impact time.
+    /// Stops that prediction pass from spamming a second IMPACT line into the Console.
+    public bool Silent { get; set; }
+
     [Header("Read-only")]
     [SerializeField] private bool hasImpacted;
     [SerializeField] private float impactedAtTime = -1f;
@@ -61,7 +65,7 @@ public class ImpactDetector : ScenarioActor
         pedestrian.NotifyStruck();
         vehicle.NotifyImpact();
 
-        if (logToConsole)
+        if (logToConsole && !Silent)
         {
             Debug.Log($"<color=red><b>IMPACT</b></color> at scenario time " +
                       $"<b>{now:F2}s</b>   (car speed {vehicle.SpeedKmh:F0} km/h)");

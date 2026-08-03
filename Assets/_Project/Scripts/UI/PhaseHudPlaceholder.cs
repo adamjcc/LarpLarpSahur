@@ -44,7 +44,7 @@ public class PhaseHudPlaceholder : MonoBehaviour
             GamePhase.FreeRoam      => "WASD walk      [C] her POV      [V] his POV      " +
                                        "[B] passenger seat      [ENTER] begin intervention",
             GamePhase.PovReplay     => "watching...",
-            GamePhase.PassengerSeat => "[V] see what he saw      [ESC] get out",
+            GamePhase.PassengerSeat => "[V] see what he saw      [Q] get out",
             GamePhase.Intervene     => "WASD walk — fix the hazards before impact",
             GamePhase.Resolve       => "watching the outcome...",
             GamePhase.Debrief       => "[ENTER] try again",

@@ -141,6 +141,44 @@ public class ScenarioRunner : MonoBehaviour
         }
     }
 
+    /// Runs the whole scenario silently, in one frame, purely to find out WHEN something
+    /// happens — then puts everything back as if nothing had occurred.
+    ///
+    /// Used to answer "what time does the crash actually land at?" before it happens, so
+    /// the on-screen countdown can hit 0.00 at the moment of impact instead of a second
+    /// or two after it. Same fixed-step maths as normal play, so the answer is exact.
+    ///
+    /// Returns the scenario time at which stopWhen first became true, or -1 if it never did.
+    public float SimulateUntil(System.Func<bool> stopWhen, float maxTime)
+    {
+        if (stopWhen == null) return -1f;
+
+        bool wasPlaying = IsPlaying;
+        ResetScenario();
+
+        float stoppedAt = -1f;
+        int guard = 0;
+        int maxSteps = Mathf.CeilToInt(maxTime / step) + 10;
+
+        while (ScenarioTime < maxTime && guard < maxSteps)
+        {
+            guard++;
+            StepOnce();
+
+            if (stopWhen())
+            {
+                stoppedAt = ScenarioTime;
+                break;
+            }
+        }
+
+        // Leave no trace — the caller does its own SeekTo straight afterwards
+        ResetScenario();
+        IsPlaying = wasPlaying && false;
+
+        return stoppedAt;
+    }
+
     /// Pushes TimeScale onto Animators and anything else Unity drives on its own.
     /// Call this whenever you change TimeScale.
     public void PushVisualTimeScale()

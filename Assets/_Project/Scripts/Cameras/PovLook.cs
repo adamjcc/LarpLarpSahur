@@ -25,10 +25,29 @@ public class PovLook : MonoBehaviour
     private float yaw;
     private float pitch;
 
-    /// Snap back to looking straight ahead. Called when this camera becomes live, so you
+    // The rotation you set in the Inspector. Mouse-look is applied ON TOP of this, so the
+    // passenger-seat camera keeps its 25-degree turn toward the driver and the limits are
+    // measured from THAT direction, not from straight ahead.
+    private Quaternion baseRotation;
+    private bool captured;
+
+    private void Awake()
+    {
+        CaptureBase();
+    }
+
+    private void CaptureBase()
+    {
+        if (captured) return;
+        baseRotation = transform.localRotation;
+        captured = true;
+    }
+
+    /// Snap back to the resting direction. Called when this camera becomes live, so you
     /// never inherit where you happened to be looking last time.
     public void ResetLook()
     {
+        CaptureBase();
         yaw = 0f;
         pitch = 0f;
         Apply();
@@ -57,6 +76,7 @@ public class PovLook : MonoBehaviour
 
     private void Apply()
     {
-        transform.localRotation = Quaternion.Euler(pitch, yaw, 0f);
+        // base first, then the player's offset from it
+        transform.localRotation = baseRotation * Quaternion.Euler(pitch, yaw, 0f);
     }
 }

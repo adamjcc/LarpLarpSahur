@@ -44,7 +44,15 @@ public class CameraDirector : MonoBehaviour
     public CameraId Current { get; private set; }
 
     /// Make one camera live and everything else stand by.
-    public void Activate(CameraId id)
+    ///
+    /// allowLook decides whether the player may move this camera with the mouse.
+    /// The SAME camera is used two different ways:
+    ///   POV replay in Free Roam  -> allowLook FALSE. The view is welded to where she was
+    ///                               actually looking, and you CANNOT look up at the car.
+    ///                               That is the entire point of the shot.
+    ///   Stepping into her eyes   -> allowLook TRUE, so you can look down at her phone.
+    ///   during Intervene
+    public void Activate(CameraId id, bool allowLook = true)
     {
         Current = id;
 
@@ -57,11 +65,14 @@ public class CameraDirector : MonoBehaviour
                 cameras[i].cam.Priority = isLive ? livePriority : standbyPriority;
             }
 
-            // Only the live camera is allowed to read the mouse, or two of them would
-            // both accumulate rotation and you'd get very confusing drift.
+            // Only the live camera may read the mouse, or two of them would both bank up
+            // rotation and you would get very confusing drift when you switched back.
             if (cameras[i].look != null)
             {
-                cameras[i].look.enabled = isLive;
+                cameras[i].look.enabled = isLive && allowLook;
+
+                // Always re-centre, even when look is off, so a locked replay starts
+                // pointing exactly where the Inspector says it should.
                 if (isLive) cameras[i].look.ResetLook();
             }
         }
