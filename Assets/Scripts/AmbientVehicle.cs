@@ -12,7 +12,7 @@ public class AmbientVehicle : MonoBehaviour
     private int currentWaypointIndex = 0;
 
     [Header("Sensor Settings")]
-    public float sensorLength = 6f;
+    public float sensorLength = 2f;
     
     
     public LayerMask obstacleMask; 
