@@ -153,7 +153,6 @@ public class ScenarioRunner : MonoBehaviour
     {
         if (stopWhen == null) return -1f;
 
-        bool wasPlaying = IsPlaying;
         ResetScenario();
 
         float stoppedAt = -1f;
@@ -174,7 +173,7 @@ public class ScenarioRunner : MonoBehaviour
 
         // Leave no trace — the caller does its own SeekTo straight afterwards
         ResetScenario();
-        IsPlaying = wasPlaying && false;
+        IsPlaying = false;
 
         return stoppedAt;
     }

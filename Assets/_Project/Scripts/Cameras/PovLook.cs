@@ -15,12 +15,19 @@ public class PovLook : MonoBehaviour
     [SerializeField] private float sensitivity = 2f;
 
     [Header("Limits, in degrees from the resting direction")]
-    [SerializeField] private float minPitch = -70f;   // how far down you can look
-    [SerializeField] private float maxPitch = 45f;    // how far up you can look
+    // NOTE: named by what they DO, not by min/max. In Unity a positive X-rotation tilts
+    // the nose DOWN, so "minPitch = -70" actually meant "70 degrees UP" — which is how the
+    // brake pedal at 57.7 degrees below horizontal ended up out of reach behind a 45 cap.
+    [Tooltip("How far below the resting direction you can look. The brake pedal is about " +
+             "58 degrees below the driver's eyeline, so this needs headroom.")]
+    [SerializeField] private float maxLookDownAngle = 80f;
+
+    [Tooltip("How far above the resting direction you can look.")]
+    [SerializeField] private float maxLookUpAngle = 60f;
 
     [SerializeField] private bool clampYaw = true;
-    [SerializeField] private float minYaw = -70f;     // left
-    [SerializeField] private float maxYaw = 70f;      // right
+    [SerializeField] private float maxLookLeftAngle = 80f;
+    [SerializeField] private float maxLookRightAngle = 80f;
 
     private float yaw;
     private float pitch;
@@ -66,10 +73,12 @@ public class PovLook : MonoBehaviour
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
         yaw += mouseX;
-        pitch -= mouseY;   // inverted: pushing the mouse forward looks up
+        pitch -= mouseY;   // mouse forward = look up
 
-        if (clampYaw) yaw = Mathf.Clamp(yaw, minYaw, maxYaw);
-        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+        // Positive pitch = looking DOWN, negative = looking UP.
+        pitch = Mathf.Clamp(pitch, -maxLookUpAngle, maxLookDownAngle);
+
+        if (clampYaw) yaw = Mathf.Clamp(yaw, -maxLookLeftAngle, maxLookRightAngle);
 
         Apply();
     }
