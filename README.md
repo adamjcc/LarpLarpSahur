@@ -232,13 +232,15 @@ These choices kept the experience clear, repeatable and suitable for a short cla
 
 ### External assets and software
 
-| Asset or tool                                                       | Source                                             | Use in Road Ready                                   |
-| ------------------------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------- |
-| Hodaart Low Poly Character Collection 3                             | Unity Asset Store, Standard Unity Asset Store EULA | Human characters                                    |
-| Unity Starter Assets - First Person Controller                      | Unity Technologies, Unity Companion License        | Player movement and camera controls                 |
-| Mixamo                                                              | Adobe, https://www.mixamo.com                      | Character animation clips                           |
-| FREE Cartoon Car Pack - Simple Vehicles                             | Unity Asset Store, Standard Unity Asset Store EULA | Background and placeholder vehicle assets           |
-| Cinemachine, AI Navigation, Input System, Timeline and Universal RP | Unity Technologies, Unity Companion License        | Cameras, navigation, input, sequences and rendering |
+| Asset or tool                                                       | Source                                                                                                                                           | Use in Road Ready                                   |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| Hodaart Low Poly Character Collection 3                             | Unity Asset Store, Standard Unity Asset Store EULA                                                                                               | Human characters                                    |
+| Unity Starter Assets - First Person Controller                      | Unity Technologies, Unity Companion License                                                                                                      | Player movement and camera controls                 |
+| Mixamo                                                              | Adobe, https://www.mixamo.com                                                                                                                    | Character animation clips                           |
+| FREE Cartoon Car Pack - Simple Vehicles                             | Unity Asset Store, Standard Unity Asset Store EULA                                                                                               | Background and placeholder vehicle assets           |
+| Cinemachine, AI Navigation, Input System, Timeline and Universal RP | Unity Technologies, Unity Companion License                                                                                                      | Cameras, navigation, input, sequences and rendering |
+| Headphones Model                                                    | [User "~Drift~" on Sketchfab](https://skfb.ly/oRFAr), licensed under [Creative Commons Attribution](http://creativecommons.org/licenses/by/4.0/) | Player pedestrian character model                   |
+| Low Poly Mobile Phone                                                    | [User "kimmy.k" on Sketchfab](https://skfb.ly/owJHu), licensed under [Creative Commons Attribution](http://creativecommons.org/licenses/by/4.0/) | Player pedestrian character model                   |
 
 The full asset list, exact source links and licence records are kept in `Docs/CREDITS.md`.
 

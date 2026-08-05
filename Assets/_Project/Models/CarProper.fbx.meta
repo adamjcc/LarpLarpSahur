@@ -1,9 +1,79 @@
 fileFormatVersion: 2
-guid: d0c6f08a27a6a144a8fb1ce47bd84d6f
+guid: 18687a70564243043bab73a6f155c9a9
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Brake_lights2
+    second: {fileID: 2100000, guid: 363089993a1e27c44abd7be0b8f8a353, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bumpers2
+    second: {fileID: 2100000, guid: 1937694c540c3b14295493cafce4bc14, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Chassis
+    second: {fileID: 2100000, guid: 3fad0786ea4b51f418bbd27f52ce54b0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Front_lights2
+    second: {fileID: 2100000, guid: 459ea09fe19877747bf1d9d057e1e3c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Handler2
+    second: {fileID: 2100000, guid: c334201d76f0ced4285a59c4c7182d6b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: InteriorPanel
+    second: {fileID: 2100000, guid: 9809756b55e30e64c8472e53bf34216e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: InteriorPanel2
+    second: {fileID: 2100000, guid: 3c5eb91c7a90a3648a27b3862e2b0af0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mirror2
+    second: {fileID: 2100000, guid: 07c8a51e69cf7444ba873e2b1e9454d2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Rim2
+    second: {fileID: 2100000, guid: 144b53416995b2f488d1a5efede898fc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tire
+    second: {fileID: 2100000, guid: 4f154a40ddf1a474dae7ffeca57b761a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tire1
+    second: {fileID: 2100000, guid: fff01f23c0e41f948848ba9ac1bacd9c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tire2
+    second: {fileID: 2100000, guid: cf76000da7499164db629ab2f973a3ef, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Turn_lights2
+    second: {fileID: 2100000, guid: 0558b3ee568922c459b066a00b7f7293, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Windows
+    second: {fileID: 2100000, guid: 9944f42cbf323574b888b38f743b7044, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -35,7 +105,7 @@ ModelImporter:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
-    addColliders: 0
+    addColliders: 1
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
     importPhysicalCameras: 1
