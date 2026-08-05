@@ -1,4 +1,3 @@
-# Road Safety Game - Made by Larp Larp Sahur
 # Road Ready - See the Risk. Change the Outcome.
 
 **Ngee Ann Polytechnic | Diploma in Immersive Media | Year 2.1 Integrated Project 2026**
