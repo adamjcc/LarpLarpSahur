@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// Base class for anything that takes part in the replayable crash.
@@ -24,6 +25,57 @@ public abstract class ScenarioActor : MonoBehaviour
         // GetComponentInChildren finds the Animator even when it's on the model
         // one or two levels down, which is how imported characters are set up
         animator = GetComponentInChildren<Animator>();
+
+        RefreshAnimatorParameters();
+    }
+
+    // ------------------------------------------------------------------
+    //  SAFE ANIMATOR CALLS
+    //
+    //  Setting a parameter an Animator Controller doesn't have logs a warning every
+    //  single time. While the characters are still using the stock Hodaart controller
+    //  (which has no "OnPhone" or "Hit"), that would spam the Console constantly and
+    //  bury real errors.
+    //
+    //  So we cache which parameters actually exist and quietly skip the rest. Once the
+    //  proper controller is built the same calls just start working, with no code change.
+    // ------------------------------------------------------------------
+
+    private HashSet<string> animatorParameters;
+
+    /// Call this if you swap the Animator Controller at runtime.
+    public void RefreshAnimatorParameters()
+    {
+        animatorParameters = new HashSet<string>();
+
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+
+        // Read once and cache — animator.parameters allocates an array on every access,
+        // and SetAnimFloat is called on every simulation tick.
+        foreach (AnimatorControllerParameter p in animator.parameters)
+        {
+            animatorParameters.Add(p.name);
+        }
+    }
+
+    protected bool HasAnimatorParameter(string parameterName)
+    {
+        return animatorParameters != null && animatorParameters.Contains(parameterName);
+    }
+
+    protected void SetAnimBool(string parameterName, bool value)
+    {
+        if (HasAnimatorParameter(parameterName)) animator.SetBool(parameterName, value);
+    }
+
+    protected void SetAnimFloat(string parameterName, float value)
+    {
+        if (HasAnimatorParameter(parameterName)) animator.SetFloat(parameterName, value);
+    }
+
+    protected void SetAnimTrigger(string parameterName)
+    {
+        if (HasAnimatorParameter(parameterName)) animator.SetTrigger(parameterName);
     }
 
     protected virtual void Start()
