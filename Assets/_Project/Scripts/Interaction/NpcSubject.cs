@@ -42,12 +42,17 @@ public class NpcSubject : MonoBehaviour, IInteractable
     [SerializeField] private Highlighter highlighter;
     [SerializeField] private ScenarioDirector director;
 
+    [Tooltip("The conversation shown when you talk to this person in Free Roam. " +
+             "Leave empty to search this object and its children.")]
+    [SerializeField] private DialogueSequence dialogue;
+
     public Subject Who => subject;
 
     private void Awake()
     {
         if (highlighter == null) highlighter = GetComponent<Highlighter>();
         if (director == null) director = FindFirstObjectByType<ScenarioDirector>();
+        if (dialogue == null) dialogue = GetComponentInChildren<DialogueSequence>();
 
         if (gameObject.layer != LayerMask.NameToLayer("Interactable"))
         {
@@ -139,12 +144,16 @@ public class NpcSubject : MonoBehaviour, IInteractable
                 // Talking to the driver means getting into the passenger seat beside him
                 director.EnterPassengerSeat();
             }
+            else if (dialogue != null && UIManager.Instance != null)
+            {
+                // The last page of the conversation carries the "See what she saw" button.
+                UIManager.Instance.ShowDialogue(dialogue);
+            }
             else
             {
-                // Part 5 replaces this with the real dialogue panel, whose last page
-                // carries the "See what she saw" button.
-                Debug.Log($"<color=#ffd08e>[TALK]</color> {displayName} — " +
-                          "(dialogue comes in Part 5). Press C to see her POV replay.");
+                // No conversation authored yet — go straight to the replay so the flow
+                // is still testable.
+                PlayTheirReplay();
             }
         }
     }

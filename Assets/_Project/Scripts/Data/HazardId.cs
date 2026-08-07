@@ -20,8 +20,36 @@ public enum HazardId
     // ---- Driver: optional 5th, build last ----
     CarDrinkBottle,         // open drink container in the car
 
-    // ---- Red herrings: clickable, described, change nothing ----
+    // ------------------------------------------------------------------
+    //  NON-CONTRIBUTING OBJECTS
+    //
+    //  Everything below can be highlighted, examined and clicked exactly like a real
+    //  hazard, but none of it counts toward the 4/4 needed to prevent the collision.
+    //  Tick "Is Red Herring" on the component and the game tells the player plainly
+    //  that changing it would not have helped.
+    //
+    //  They matter more than they look: an investigation where every clickable thing
+    //  is a correct answer is not an investigation, it is a checklist.
+    //  Add as many as you like — this list is free to grow.
+    // ------------------------------------------------------------------
+
+    // On the pedestrian
     PedestrianUmbrella,
+    PedestrianBag,
+    PedestrianShoes,
+
+    // In or on the car
     CarWipers,
-    CarRadio
+    CarRadio,
+    CarMirror,
+    CarSeatbelt,
+    CarGloveBox,
+    CarHandbrake,
+
+    // Around the scene
+    RoadSign,
+    StreetLight,
+    RoadMarking,
+    KerbRamp,
+    DrainCover
 }

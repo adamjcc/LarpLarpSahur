@@ -73,10 +73,18 @@ public class ScenarioDirector : MonoBehaviour
     public bool IsInNpcView => npcViewActive || phase == GamePhase.PassengerSeat;
 
     /// Whether the raycast interaction system should run at all right now.
+    /// A panel being open suspends it, so clicking a button cannot also re-trigger
+    /// whatever object is sitting behind the panel.
     public bool CanInteract =>
-        phase == GamePhase.FreeRoam ||
-        phase == GamePhase.PassengerSeat ||
-        phase == GamePhase.Intervene;
+        !UIManager.ModalOpen &&
+        (phase == GamePhase.FreeRoam ||
+         phase == GamePhase.PassengerSeat ||
+         phase == GamePhase.Intervene);
+
+    /// True while the opening bird's-eye shot is still running. The Replay and Continue
+    /// buttons wait for this to go false so they don't cover the crash.
+    public bool IsObservationPlaying =>
+        phase == GamePhase.Observe && runner != null && runner.IsPlaying;
 
     // Set while standing inside someone's view during Intervene. Not a phase of its own,
     // because the clock and the countdown must keep running exactly as before.
@@ -252,6 +260,67 @@ public class ScenarioDirector : MonoBehaviour
         player.SetControlEnabled(active);
     }
 
+    /// Called by UIManager when a panel opens or closes.
+    ///
+    /// Opening: free the cursor so buttons are clickable, and stop the player walking off
+    /// while they read. Closing: hand control back to whatever the CURRENT phase wants,
+    /// rather than blindly re-enabling — otherwise closing a panel while sitting in the
+    /// passenger seat would stand you up and let you walk through the car.
+    public void SetModalControl(bool modalOpen)
+    {
+        if (player == null) return;
+
+        if (modalOpen)
+        {
+            player.SetControlEnabled(false);
+            player.SetCursorLocked(false);
+            return;
+        }
+
+        ApplyPhaseControlState();
+    }
+
+    /// Re-applies only the player/cursor part of the current phase, without touching the
+    /// clock or the cameras. Used when a panel closes.
+    public void ApplyPhaseControlState()
+    {
+        if (player == null) return;
+
+        switch (phase)
+        {
+            case GamePhase.FreeRoam:
+                SetPlayerActive(true);
+                break;
+
+            case GamePhase.Intervene:
+                // Inside someone's eyes the body stays parked but the view still turns
+                if (npcViewActive)
+                {
+                    player.SetControlEnabled(false);
+                    player.SetCursorLocked(true);
+                }
+                else
+                {
+                    SetPlayerActive(true);
+                }
+                break;
+
+            case GamePhase.PassengerSeat:
+                player.SetControlEnabled(false);
+                player.SetCursorLocked(true);
+                break;
+
+            case GamePhase.Debrief:
+                player.SetControlEnabled(false);
+                player.SetCursorLocked(false);
+                break;
+
+            default:
+                SetPlayerActive(false);
+                break;
+        }
+    }
+
     // =====================================================================
     //  AUTOMATIC TRANSITIONS
     // =====================================================================
@@ -393,6 +462,10 @@ public class ScenarioDirector : MonoBehaviour
     // =====================================================================
     private void HandleDebugKeys()
     {
+        // A panel owns Enter, Q, Escape and right-click while it is open. Without this
+        // guard, dismissing a dialogue would also fire "back out of the passenger seat".
+        if (UIManager.ModalOpen) return;
+
         if (Input.GetKeyDown(KeyCode.Z)) EnterPhase(GamePhase.Observe);
         if (Input.GetKeyDown(KeyCode.X)) EnterPhase(GamePhase.FreeRoam);
         if (Input.GetKeyDown(KeyCode.C)) PlayPovReplay(CameraId.PedestrianPov);

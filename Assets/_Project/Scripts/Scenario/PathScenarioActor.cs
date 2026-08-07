@@ -16,6 +16,18 @@ public abstract class PathScenarioActor : ScenarioActor
     [Tooltip("Leave empty — it finds the one on SYSTEMS automatically.")]
     [SerializeField] protected InterventionState interventions;
 
+    [Header("Steering — leave both at 0 for instant snapping")]
+    [Tooltip("Metres to look ahead along the path when deciding which way to face.\n\n" +
+             "0 = face the current segment exactly, which makes a vehicle pivot on the spot " +
+             "at a corner. Try 4 on the car so it starts turning INTO the bend.\n" +
+             "Leave at 0 for people — they walk in straight lines.")]
+    [SerializeField] private float lookAheadDistance = 0f;
+
+    [Tooltip("Degrees per second the object may rotate. 0 = snap instantly.\n" +
+             "Try 90 on the car. Purely cosmetic — it never affects position, so the " +
+             "collision timing is untouched.")]
+    [SerializeField] private float maxTurnRate = 0f;
+
     [Header("Read-only (fills in while playing)")]
     [SerializeField] protected float distanceTravelled;
     [SerializeField] protected float startDistance;
@@ -61,14 +73,17 @@ public abstract class PathScenarioActor : ScenarioActor
     {
         RecalculateStartDistance();
         distanceTravelled = startDistance;
-        ApplyToTransform();
+
+        // snap on reset — easing from wherever we happened to be facing would leave the
+        // car pointing the wrong way at the start of every replay
+        ApplyToTransform(0f, snapRotation: true);
     }
 
     /// Move forward along the path by speed x dt, then place the object there.
     protected void MoveAlongPath(float speed, float dt)
     {
         distanceTravelled += speed * dt;
-        ApplyToTransform();
+        ApplyToTransform(dt, snapRotation: false);
 
         // Feeds the walk/idle blend tree once a real Animator Controller exists.
         // Safely ignored until then.
@@ -76,17 +91,36 @@ public abstract class PathScenarioActor : ScenarioActor
     }
 
     /// Ask the path where we are now and put the transform there.
-    protected void ApplyToTransform()
+    protected void ApplyToTransform(float dt, bool snapRotation)
     {
         if (path == null || !path.IsValid) return;
 
         Vector3 position = path.Evaluate(distanceTravelled, out Vector3 forward);
         transform.position = position;
 
-        // LookRotation throws if handed a zero-length direction
-        if (forward.sqrMagnitude > 0.0001f)
+        // Look a few metres up the path instead of at the current segment, so a vehicle
+        // begins turning BEFORE it reaches the corner rather than pivoting on the spot.
+        if (lookAheadDistance > 0.01f)
         {
-            transform.rotation = Quaternion.LookRotation(forward);
+            Vector3 ahead = path.Evaluate(distanceTravelled + lookAheadDistance);
+            Vector3 toAhead = ahead - position;
+            if (toAhead.sqrMagnitude > 0.0001f) forward = toAhead.normalized;
+        }
+
+        // LookRotation throws if handed a zero-length direction
+        if (forward.sqrMagnitude <= 0.0001f) return;
+
+        Quaternion target = Quaternion.LookRotation(forward);
+
+        if (snapRotation || maxTurnRate <= 0f)
+        {
+            transform.rotation = target;
+        }
+        else
+        {
+            // dt is the fixed simulation step, so this stays perfectly repeatable
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation, target, maxTurnRate * dt);
         }
     }
 

@@ -151,8 +151,14 @@ public class HazardInteractable : MonoBehaviour, IInteractable
     {
         if (ledger != null) ledger.Record(hazardId);
 
-        // Part 5 replaces this Debug.Log with the real description panel
-        Debug.Log($"<color=#8ecfff>[EXAMINE]</color> <b>{displayName}</b>  —  {examineDescription}");
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowExamine(displayName, examineDescription);
+        }
+        else
+        {
+            Debug.Log($"<color=#8ecfff>[EXAMINE]</color> <b>{displayName}</b>  —  {examineDescription}");
+        }
     }
 
     /// Intervene: actually change it.
@@ -171,5 +177,13 @@ public class HazardInteractable : MonoBehaviour, IInteractable
         string tag = isRedHerring ? "no effect" : "contributing factor";
         Debug.Log($"<color=lime>[FIXED]</color> <b>{displayName}</b> ({tag})   " +
                   $"{interventions.CorrectCount}/{interventions.RequiredCount}");
+
+        // Tell the player plainly when they've changed something that was never going to
+        // matter. Without this, a red herring feels identical to a real fix and the
+        // counter silently refusing to move just reads as a bug.
+        if (isRedHerring && UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowNoEffect(displayName);
+        }
     }
 }
