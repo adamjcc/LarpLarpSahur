@@ -25,9 +25,15 @@ public class NpcSubject : MonoBehaviour, IInteractable
     [SerializeField] private CameraId interveneCamera = CameraId.PedestrianPov;
 
     [Header("Free Roam behaviour")]
-    [Tooltip("The driver is spoken to from the passenger seat, so talking to him moves the " +
-             "camera into the car. The pedestrian is spoken to standing in the street.")]
+    [Tooltip("ON for the car's outer shell: clicking it climbs into the passenger seat.\n" +
+             "OFF for a person you talk to standing in the street.")]
     [SerializeField] private bool talkFromPassengerSeat;
+
+    [Tooltip("ON for the DRIVER sitting inside the car. Lets you click him once you are " +
+             "already in the passenger seat, which plays his POV replay.\n\n" +
+             "The car's outer volume must have this OFF, or you would re-enter the seat " +
+             "you are already sitting in.")]
+    [SerializeField] private bool availableInPassengerSeat;
 
     [Header("Reach")]
     [SerializeField] private float maxDistance = 12f;
@@ -67,6 +73,10 @@ public class NpcSubject : MonoBehaviour, IInteractable
                     : $"See through {displayName}'s eyes";
             }
 
+            // Already sitting beside him — clicking him replays what he saw
+            if (director.Phase == GamePhase.PassengerSeat)
+                return $"Ask {displayName} what he saw";
+
             return talkFromPassengerSeat
                 ? $"Get in and talk to {displayName}"
                 : $"Talk to {displayName}";
@@ -81,7 +91,11 @@ public class NpcSubject : MonoBehaviour, IInteractable
 
             if (director.Phase == GamePhase.FreeRoam) return true;
 
-            // During Intervene you can step in from outside. You leave with Esc,
+            // Only the driver himself is clickable once you're sitting in the car.
+            // The car's outer volume must NOT be, or you'd re-enter the seat you're in.
+            if (director.Phase == GamePhase.PassengerSeat) return availableInPassengerSeat;
+
+            // During Intervene you can step in from outside. You leave with Q,
             // not by clicking, so this hides itself once you're inside.
             if (director.IsInterventionActive) return !director.IsInNpcView;
 
@@ -107,6 +121,14 @@ public class NpcSubject : MonoBehaviour, IInteractable
         {
             // Straight into their eyes. The clock keeps running while you're in there.
             director.EnterNpcView(interveneCamera);
+            return;
+        }
+
+        // Sitting beside him in the car: clicking him plays his POV replay, and the
+        // director returns you to the passenger seat afterwards rather than the street.
+        if (director.Phase == GamePhase.PassengerSeat)
+        {
+            director.PlayPovReplay(replayCamera);
             return;
         }
 
