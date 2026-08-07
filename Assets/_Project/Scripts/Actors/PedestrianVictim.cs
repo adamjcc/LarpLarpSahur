@@ -154,27 +154,28 @@ public class PedestrianVictim : PathScenarioActor
 
         switch (next)
         {
+            // These use the safe setters from ScenarioActor, which quietly skip any
+            // parameter the current Animator Controller doesn't have. That keeps the
+            // Console clean while the characters are still on the stock Hodaart
+            // controller, and starts working by itself once the real one is built.
             case State.Distracted:
                 SetPhoneVisible(true);
-                if (animator != null) animator.SetBool("OnPhone", true);
+                SetAnimBool("OnPhone", true);
                 break;
 
             case State.Alerted:
                 SetPhoneVisible(false);
-                if (animator != null)
-                {
-                    animator.SetBool("OnPhone", false);
-                    animator.SetFloat("Speed", 0f);
-                }
+                SetAnimBool("OnPhone", false);
+                SetAnimFloat("Speed", 0f);
                 break;
 
             case State.Struck:
-                if (animator != null) animator.SetTrigger("Hit");
+                SetAnimTrigger("Hit");
                 break;
 
             case State.Safe:
             case State.Aftermath:
-                if (animator != null) animator.SetFloat("Speed", 0f);
+                SetAnimFloat("Speed", 0f);
                 break;
         }
     }

@@ -960,3 +960,46 @@ it, and make her walking speed (1.2 m/s vs a normal 1.4) one of the stated findi
    numbered 01–10), so the prefabs get built with the right ones from the start.
 
 Parts 0 and 1 don't depend on any of that, so those go ahead now.
+
+---
+
+# APPENDIX — As-built values
+
+Recorded from the working scene so they survive a model re-import or a lost prefab override.
+**Update this whenever you re-tune something.**
+
+## Car (`CarProper`, instance scale 0.41)
+
+All positions are **local to `VEHICLE_INCIDENT`**, whose scale is 1. The car's own 0.41 is
+already accounted for.
+
+> ⚠️ Keep the cameras as children of **`VEHICLE_INCIDENT`**, never of `CarProper`. Parented
+> under the car they would inherit the 0.41 and every number below would need dividing by it.
+
+| Part | Position | Notes |
+|---|---|---|
+| `Steering` | `0.419, 1.120, 0.681` | +X confirms driver-on-the-right |
+| `Pedals` / `Brake` | `0.315, 0.454, 1.086` | 45° below the driver's eyeline, 1.12 m away |
+| `Front_Lights` | `0.000, 0.912, 1.784` | +Z confirms nose-forward |
+| `Interior` | `0.000, 0.923, -0.151` | |
+| `Windows` | `0.000, 1.595, -0.312` | roof line |
+| `FR_Door` | `0.843, 1.207, 0.782` | car is ~1.69 m wide |
+| `CAM_DriverPov` | `0.42, 1.25, 0.30` | rotation `0,0,0` |
+| `CAM_PassengerSeat` | `-0.42, 1.25, 0.30` | rotation `0,40,0`, Max Look Right ≥ 110 |
+| `FrontBumper` | `0, 0.5, 1.95` | verify visually against the nose |
+| Headlights | `±0.55, 0.75, 1.85` | Spot, Range 40, Angle 50, Intensity 8 |
+| `Interact_Car` | Center `0,0.8,0`, Size `2.0,1.8,4.4` | |
+
+## Pedestrian (`Character_Pedestrian`, scale 1, ~1.7 m)
+
+| Object | Parent | Values |
+|---|---|---|
+| `Headphones_Mesh` | `mixamorig:Head` | placed by hand |
+| `Mobile Phone` | `mixamorig:Spine2` | pos `-2.02835, 0.11979, 0.92591` · rot `24.476, -180, 0` · scale `0.4` · BoxCollider centre `0,0.44,0` size `0.6,0.6,0.6` |
+| `Interact_Body` | `PEDESTRIAN_VICTIM` | pos `0,0.75,0` · Capsule radius `0.28` height `1.35` (spans y 0.075–1.425, stops below the chin) |
+| `POV_Anchor` | `PEDESTRIAN_VICTIM` | `FollowPositionOnly` → target `mixamorig:Head` |
+| `CAM_PedestrianPov` | `POV_Anchor` | pos `0, 0, 0.12` · rotation `35, 0, 0` |
+
+The phone's odd local position is normal — Mixamo bones carry baked rotations and scales, so
+local coordinates under `Spine2` do not read like world space. Re-parent it to
+`mixamorig:RightHand` once the "Texting While Walking" clip is imported.

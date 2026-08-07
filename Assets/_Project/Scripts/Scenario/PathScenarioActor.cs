@@ -69,6 +69,10 @@ public abstract class PathScenarioActor : ScenarioActor
     {
         distanceTravelled += speed * dt;
         ApplyToTransform();
+
+        // Feeds the walk/idle blend tree once a real Animator Controller exists.
+        // Safely ignored until then.
+        SetAnimFloat("Speed", speed);
     }
 
     /// Ask the path where we are now and put the transform there.
