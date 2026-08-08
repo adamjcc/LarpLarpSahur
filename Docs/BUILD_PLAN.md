@@ -14,7 +14,7 @@ Written 30 July 2026 · Unity 6000.3.13f1 · URP 17.3 · Cinemachine 3.1.2
 - [Part C — Numbers you must confirm](#part-c--numbers-you-must-confirm)
 - [Part D — Every script, and what talks to what](#part-d--every-script-and-what-talks-to-what)
 - [Part E — Scene and prefab layout](#part-e--scene-and-prefab-layout)
-- [Part F — Build order: 8 parts](#part-f--build-order-8-parts)
+- [Part F — Roadmap: where we are and what is left](#part-f--roadmap-where-we-are-and-what-is-left)
 - [Part G — Known traps, per part](#part-g--known-traps-per-part)
 - [Part H — Rubric checklist](#part-h--rubric-checklist)
 
@@ -636,208 +636,302 @@ is rock-steady with no head bob. That solves the nausea problem for free.
 
 ---
 
-# PART F — Build order: 8 parts
+# PART F — Roadmap: where we are and what is left
 
-Each part ends with something you can press Play and verify. **Do not start a part until the
-previous part's test passes.** I'll write the scripts; each part lists exactly what you do in
-the Unity editor.
+## F.0 How to read this
 
----
+Each part below tells you five things:
 
-## PART 1 — The clock *(~45 min)*
+- **Delivers** — what actually exists when it's finished
+- **Why it matters** — the reason it's on the list at all
+- **Owner** — whose job it is
+- **Effort** — rough working hours
+- **Done when** — the test that proves it works
 
-**Goal:** prove that a cube can move along a path and land in the identical spot on every replay.
-
-**Scripts I write:** `ScenarioRunner`, `ScenarioActor`, `ScenarioPath`, `ScenarioDebugKeys`,
-plus a throwaway `TestActor` that just follows a path.
-
-**What you do in Unity:**
-1. Open `Sandbox_Adam.unity` (create it: File → New Scene → Basic URP → save as that name).
-2. Create empty GameObject `SYSTEMS`. Add `ScenarioRunner` and `ScenarioDebugKeys` to it.
-3. Create empty `Path_Test`. Add `ScenarioPath`.
-4. Create 4 empty children under it, name them `WP0`–`WP3`, drag them apart in the Scene view.
-5. Select `Path_Test` → in the Inspector, set `Points` size to 4 → drag WP0–WP3 into the slots.
-   **In order.** Out of order = a zigzag path.
-6. Create a Cube. Add `TestActor`. Drag `Path_Test` into its `Path` field. Set `Speed` to 5.
-
-**Test:** Press Play. Press `P` to play, `R` to reset, `1` to seek to 3.0 s.
-- ✅ Cube moves smoothly along the cyan gizmo line.
-- ✅ Press `R` then `P` ten times — it reaches the same place at the same clock reading every time.
-- ✅ Press `1` — it jumps instantly to exactly where it was 3 seconds in. No visible loading.
+Parts are in dependency order. Anything marked ✅ is finished and tested.
 
 ---
 
-## PART 2 — The crash *(~2 hours)*
+# COMPLETED
 
-**Goal:** a capsule and a box collide at exactly the same scenario time every single run.
+## ✅ Part 1 — The scenario clock
 
-**Scripts I write:** `PedestrianVictim`, `IncidentVehicle`, `ImpactSensor`, `Intervention`,
-`InterventionState`, `HazardId`.
+**Delivers:** `ScenarioRunner`, `ScenarioActor`, `ScenarioPath`, `PathScenarioActor`.
 
-**What you do in Unity:**
-1. Create an empty called `ImpactMarker` at (0, 0, 0). This is the single point everything
-   else is measured from.
-2. Build `Path_Vehicle` — waypoints coming down the side road, **through** the marker and a
-   bit past it. Add the corner if you want; the turn is just two more waypoints.
-3. Build `Path_Pedestrian` — waypoints crossing the road, through the marker and past it.
-4. A Capsule for her (`PedestrianVictim` + CapsuleCollider), a Cube for the car
-   (`IncidentVehicle` + a child cube with a trigger BoxCollider + `ImpactSensor`).
-   **No character models yet. Grey shapes only.** Art comes much later.
-5. Set the speeds and `impactTime` from the Part C table. **You do not position the actors** —
-   they place themselves. If a path is too short, the Console will say so by exactly how much.
+**Why it mattered:** the game shows the same eight seconds up to five times, so the incident has
+to be repeatable to the centimetre. Normal Unity code isn't — it drifts with frame rate. The
+runner advances a clock in fixed 1/60 s steps and moves every actor itself, which is what makes
+rewind, replay and slow motion possible at all. Everything else in the project sits on top of it.
 
-**Test:**
-- ✅ The impact time printed in the Console is the same to two decimal places, ten runs in a row.
-- ✅ `SeekTo(impact + 2)` gives you a frozen aftermath: car stopped past the crossing,
-  capsule beside it.
-- ✅ Manually tick a couple of interventions in the `InterventionState` Inspector, press `R`
-  then `P` — **no collision**. This is the branching working.
+**Done when:** a cube reset and replayed ten times lands in the identical place at the identical
+clock reading. ✅
 
----
+## ✅ Part 2 — The crash
 
-## PART 3 — Cameras and phases *(~2 hours)*
+**Delivers:** `PedestrianVictim` and `IncidentVehicle` state machines, `InterventionState`,
+`ImpactDetector`, `HazardId`, `ScenarioSettings`.
 
-**Goal:** walk the entire game loop, start to finish, with keyboard shortcuts and no content.
+**Why it mattered:** this is the game. Two characters choreographed to meet at a marker, with a
+single `if` at each decision point that reads what the player has fixed. That `if` is the whole
+mechanic.
 
-**Scripts I write:** `CameraDirector`, `PovLook`, `FollowPositionOnly`, `ScenarioDirector`,
-a placeholder `PhaseHud`.
+**Done when:** the impact time is identical every run; fixing all four hazards prevents it;
+fixing only some produces a crash that visibly carries the changes. ✅
 
-**What you do in Unity:**
-1. Main Camera → Add Component → `CinemachineBrain`.
-2. Create the `CAM_*` objects (GameObject → Cinemachine → Cinemachine Camera). Position them.
-3. Drag the Starter Assets `PlayerCapsule` prefab in. Position at (6, 0, −6).
-4. `CAM_PlayerFP` → Tracking Target = `PlayerCameraRoot`, Body = Hard Lock To Target,
-   Aim = Same As Follow Target.
-5. On `CameraDirector`, fill the array: one row per camera, pick the `CameraId` from the
-   dropdown and drag the matching `CAM_*` object in.
-6. On `ScenarioDirector`, drag in the runner, the camera director, the player capsule.
+## ✅ Part 3 — Cameras and phases
 
-**Test:** press `1`–`7` to jump between phases.
-- ✅ Observe: bird's-eye, crash plays, you can't move.
-- ✅ Free Roam: you're on the ground, walking, the crash is frozen mid-aftermath.
-- ✅ Intervene: it cuts to 5s before impact, everything crawls, **you still walk at normal speed.**
-- ✅ Cursor is locked when it should be and free when it should be — every single time.
+**Delivers:** `CameraDirector`, `PovLook`, `FollowPositionOnly`, `PlayerRig`,
+`ScenarioDirector` phase machine.
 
-> **This is the moment the game becomes real.** Everything after this is filling it in.
+**Why it mattered:** the moment it stopped being scripts and became a game. Six camera angles,
+seven phases, and one method that owns every control-state change so no phase can leave you with
+an invisible cursor and a frozen player.
 
----
+**Done when:** you can press Enter four times and walk the whole loop start to finish. ✅
 
-## PART 4 — Interaction *(~2 hours)*
+## ✅ Part 4 — Interaction
 
-**Goal:** look at a thing, see its name, click it, something happens.
+**Delivers:** `IInteractable`, `PlayerInteractor`, `Highlighter`, `HazardInteractable`,
+`NpcSubject`, `EvidenceLedger`.
 
-**Scripts I write:** `IInteractable`, `PlayerInteractor`, `Highlighter`, `HazardInteractable`,
-`NpcSubject`, `HudPrompt`.
+**Why it mattered:** one raycast that talks to an interface rather than to specific classes,
+so new clickable things never require touching the raycaster. The `Access` field
+(`FromPovOnly` / `FromOutsideOnly` / `Both`) is what makes the headphones reachable from outside
+and the phone only from inside her eyes.
 
-**What you do in Unity:**
-1. Create the `Interactable` layer.
-2. Make a bright emissive `M_Highlight` material (URP/Lit, Emission on, orange).
-3. Put three test cubes on the `Interactable` layer with `HazardInteractable` + `Highlighter`.
-4. `PlayerInteractor` on the PlayerCapsule → set `Interactable Mask` to **only** `Interactable`.
-5. Canvas → a crosshair Image and a TextMeshPro text at the bottom. `HudPrompt` on the Canvas.
+**Done when:** aiming at her head gives headphones, her chest gives dialogue, and a
+`FromPovOnly` object refuses to be changed until you're in the right view. ✅
 
-**Test:**
-- ✅ Looking at a cube makes it glow and shows "Examine phone" at the bottom.
-- ✅ Looking away removes both — and the cube goes back to its *exact* original material.
-- ✅ Clicking prints to the Console.
-- ✅ Looking at the floor or a wall does nothing at all. (If it does, your mask is wrong.)
+## ✅ Part 5 — Real models
 
----
+**Delivers:** `CarProper` with its `Pedals/Brake` and `Signal_Lever` wired as hazards,
+Hodaart characters, headphones and phone props, POV anchors, safe animator calls.
 
-## PART 5 — Free Roam content *(~3 hours)*
+**Why it mattered:** grey boxes proved the systems; real geometry proves the *design*. It also
+surfaced two real problems — props buried inside the interaction capsule, and POV pitch limits
+that couldn't reach the brake pedal.
 
-**Goal:** the full investigation loop with real characters.
+**Done when:** every hazard is visible, highlightable and clickable from its intended view. ✅
 
-**Scripts I write:** `DialogueSequence`, `DialogueUI`, `WitnessLook`, plus the passenger-seat
-and POV-replay flows in the director.
+## ✅ Part 6 — Canvas UI and dialogue
 
-**What you do in Unity:**
-1. Swap the grey capsule for a Hodaart character. Swap the cube for a `Pack_FREE_Cars` car.
-2. Build the pedestrian prefab exactly as in section E.3 — **especially the two colliders**.
-3. Build the car prefab as in E.4, with a placeholder box interior.
-4. Type the dialogue lines into the `DialogueSequence` arrays in the Inspector.
-5. Write the no-spoiler descriptions for all 8 hazards. *(These matter — "her phone is
-   unlocked and the screen is still on" tells the player something without handing them the
-   answer.)*
+**Delivers:** `UIManager`, `DialogueSequence`, a Screen-Space Canvas at 1920×1080 reference,
+and the modal system that suspends movement and the interaction ray while a panel is open.
 
-**Test:**
-- ✅ Aim at her head → "Headphones" + description. Aim at her chest → "Talk to her".
-  **This is the collider test. Get it working before moving on.**
-- ✅ Dialogue advances, and the last page offers "See what she saw".
-- ✅ That replay is locked on her phone screen — you physically cannot look up at the car.
-- ✅ Aiming at the car puts you in the passenger seat facing the driver; you can look around
-  the dash; Esc puts you back outside standing where you were.
+**Why it mattered:** the two OnGUI placeholders were never shippable — no fonts, no layout
+control, no styling. A real Canvas means Part 12 is pure visual work with no code changes.
+Dialogue is also what gives the POV replays a reason to exist: you hear someone's account, then
+ask to see it.
+
+**Done when:** talking to her opens a panel, clicking through reaches a "See what she saw"
+button, the replay plays, and control comes back correctly. ✅
 
 ---
 
-## PART 6 — Intervene *(~2 hours)*
+# REMAINING
 
-**Goal:** the actual game.
+## Part 7 — Scoring and debrief
 
-**Scripts I write:** POV entry/exit, phase-aware `IsAvailable`, countdown HUD, hazard counter.
+**Delivers:** `ScoreManager`, a debrief screen, and per-hazard explanation text.
 
-**What you do in Unity:**
-1. Wire the `onApplied` UnityEvents in the Inspector — e.g. headlight button → `VehicleLights.TurnOn()`.
-2. Set every hazard's `access` field correctly (this is where the design lives).
-3. Add the countdown and "HAZARDS 0 / 4" to the Canvas.
+**Why it matters:** this is where the educational payload actually lands, and it is the single
+biggest source of Delta Challenge marks. Everything before it sets up a lesson; this is the
+lesson. It is also nearly free to build, because `EvidenceLedger` (what you examined) and
+`InterventionState` (what you changed) have been recording since Part 4 — the debrief just
+reads them back.
 
-**Test:**
-- ✅ Walk to her, press E, you're in her eyes, look down, click the phone — she pockets it.
-- ✅ Exit, aim at her head from outside, click — headphones come off.
-- ✅ Walk toward the car (it's coming at you), press E, click the headlight button — **the road
-  lights up.** Click the brake — the car visibly slows.
-- ✅ All four → the counter hits 4/4 and it auto-advances.
-- ✅ Do nothing → the countdown hits zero and the crash happens again.
+The interesting part is that those two are separate. The debrief can distinguish a factor you
+**never noticed** from one you **noticed and chose to ignore**, and say something different
+about each. That distinction is worth more than a number.
 
----
+**Owner:** Adam · **Effort:** ~2–3 h
 
-## PART 7 — Resolve, Debrief, Score *(~2 hours)*
+**Done when:** finishing with 2/4 produces a screen naming exactly which two you missed, why
+each mattered, and what the safe behaviour would have been.
 
-**Scripts I write:** `ScoreManager`, `DebriefUI`, `HazardInfo`, the Resolve phase.
+## Part 8 — Input Action Asset conversion
 
-Resolve is nearly free: seek back to `impact − 5`, set `TimeScale = 1`, activate `CAM_Resolve`,
-play. Because `InterventionState` survives the reset, your changes are baked in from the start
-of the replay — the headlights are on the whole way, she never had the phone out. That's the
-"what if" shot.
+**Delivers:** `Interact`, `Back` and `Continue` actions added to `StarterAssets.inputactions`,
+a small `GameInput` component, and four scripts moved off legacy input.
 
-**Test:**
-- ✅ Fix 4 → watch her stop at the kerb, car slides past → Excellent.
-- ✅ Fix 2 → watch the crash happen anyway → Try again.
-- ✅ Retry resets everything and puts you back at Observe.
+**Why it matters:** honestly, not much for the rubric — Active Input Handling is set to "Both",
+so what exists works. The real wins are gamepad support, rebindable controls, one consistent
+look sensitivity instead of two different ones, and dropping the legacy dependency entirely so
+the project can't break if that setting ever changes.
 
----
+**Deliberately scheduled after Part 7** because content is the critical path and swapping input
+mid-build adds risk for no deliverable.
 
-## PART 8 — Content and polish
+**One gotcha:** `PlayerRig.SetControlEnabled(false)` currently sets `cursorInputForLook = false`,
+which would zero the Look value exactly when a POV camera needs it. That line has to go.
 
-In priority order. Stop wherever the calendar says stop:
-1. Real animations (see below)
-2. Ambient NavMesh pedestrians (rubric requirement — reuse your `NPCBrain`, renamed)
-3. Night lighting and post-processing
-4. Marcus's modelled car interior replacing the placeholder box
-5. VFX (impact, highlight scan, slow-mo screen effect, prevention success)
-6. `Scene_Training` with the police officer
-7. **The dog.** Genuinely last.
+**Owner:** Adam · **Effort:** ~1 h (mostly Editor work)
 
-### Animations — only three downloads needed
+**Done when:** every control works from both keyboard/mouse and a gamepad, with no
+`Input.GetKey` left outside the debug scripts.
 
-You already have Idle and Walking from Hodaart. The rig is **Humanoid on a Mixamo skeleton**,
-so anything from mixamo.com retargets straight onto it. Download these three as FBX for Unity,
-**without skin**:
+## Part 9 — Character animation
 
-| Mixamo search | For | Used in |
+**Delivers:** one custom Animator Controller, three Mixamo clips, applied to both characters.
+
+**Why it matters:** everything currently stands in a T-pose or an idle. This is the largest
+single jump in how finished the game looks, and it costs less than it appears — the rig is
+Humanoid on a Mixamo skeleton, so clips retarget for free.
+
+**What to build:**
+
+| Parameter | Type | Drives |
 |---|---|---|
-| "Texting While Walking" | her, before impact | Walking / Distracted states |
-| "Stumble Backwards" or "Hit Reaction" | the moment of impact | Struck state |
-| "Sitting Idle" | the driver | the whole game |
+| `Speed` | float | blend tree: Idle ↔ Walk |
+| `OnPhone` | bool | walking-while-texting variant |
+| `Hit` | trigger | the moment of impact |
+| `Sit` | bool | the driver, permanently on |
 
-Then build your own Animator Controller — the Hodaart one is bool-driven (`Walking` as a
-`bool`), which is a weak setup. Yours wants a `Speed` **float** with a blend tree between Idle
-and Walk, plus an `OnPhone` bool and a `Hit` trigger. I'll walk you through it in Part 8.
+**Clips to download** (mixamo.com, FBX for Unity, *without skin*):
+*Texting While Walking* · *Stumble Backwards* (or any Hit Reaction) · *Sitting Idle*
 
-Everything else (talking, reacting, looking around) is a nice-to-have you add if there's time.
+**⚠️ The critical setting: `Apply Root Motion` must be OFF on every Animator.** Root motion lets
+the animation drive position — which would fight the path system for control and make the
+collision timing drift. This is the one setting that can quietly break Part 1's determinism.
+
+The code is already ready: `MoveAlongPath` calls `SetAnimFloat("Speed", ...)` every tick, and
+`ScenarioActor` caches which parameters exist and silently skips the rest. The moment the
+controller has these parameters, the existing calls start working with **no code change**.
+
+**Also in this part:** re-parent the phone from `PhoneHolder` to `mixamorig:RightHand` and
+re-tune it against the texting animation — in Play mode, then Copy Component / Paste Component
+Values.
+
+**Owner:** Adam + Marcus · **Effort:** ~3–4 h
+
+**Done when:** she walks while texting, stumbles on impact, and the driver sits properly — and
+the impact time is still identical run to run.
+
+## Part 10 — Vehicle detail
+
+**Delivers:** cornering (**done**), plus wheel rotation, steering-wheel rotation, brake lights,
+and the damaged-car swap.
+
+**Why it matters:** the car takes a 90° junction in the opening shot, and a car that pivots on
+the spot destroys the illusion immediately.
+
+**Already built:** `PathScenarioActor` now has `Look Ahead Distance` and `Max Turn Rate`. Set
+**4** and **90** on `VEHICLE_INCIDENT`. It looks a few metres up the path rather than at the
+current segment, so it leans into the bend before reaching it. Both default to 0, so people are
+unaffected.
+
+**Why it stays flexible:** the turn is derived from the path itself, so **moving waypoints needs
+no retuning**. And because it only affects rotation, never position, the collision timing is
+untouched — you can tune it freely without re-testing determinism.
+
+**Still to do:** spin the four wheels from `CurrentSpeed`; rotate `Steering` from the frame's
+turn rate; enable `Brake_Lights` while decelerating; model a damaged body and wire
+`DamageSwapper` (**both slots must stay empty until that model exists, or the car vanishes on
+impact**).
+
+**Owner:** Darryl · **Effort:** ~2 h
+
+**Done when:** the junction reads as a real turn, and the wheels aren't skating.
+
+## Part 11 — Extra interactables
+
+**Delivers:** more clickable objects that can be examined and changed but count for nothing.
+
+**Why it matters:** more than it looks. An investigation where every clickable object is a
+correct answer isn't an investigation, it's a checklist. Objects that *might* have mattered are
+what make the four that did feel like a discovery. They also give the debrief something to say
+about judgement, not just observation.
+
+**Already built:** `HazardId` has 14 non-contributing entries — bag, shoes, umbrella, mirror,
+seatbelt, glovebox, handbrake, wipers, radio, road sign, street light, road marking, kerb ramp,
+drain cover. Tick **Is Red Herring** on the component and the player is told plainly: *"You
+changed X, but it played no part in this collision."* Without that message a red herring feels
+identical to a real fix and the counter silently refusing to move just reads as a bug.
+
+**The writing is the work, not the code.** Each needs an `Examine Description` that is
+interesting but not misleading. A good one gives a real detail with no verdict attached: *"The
+wipers are set to intermittent. It hasn't rained all week."*
+
+**Owner:** anyone · **Effort:** ~1 h of placement, ~1 h of writing
+
+**Done when:** there are at least six non-contributing objects across the pedestrian, the car
+and the street.
+
+## Part 12 — UI polish
+
+**Delivers:** a TMP font asset, a colour palette, panel artwork, and fade transitions.
+
+**Why it matters:** default Arial and flat black boxes read as unfinished no matter how good the
+systems underneath are. This is the cheapest possible improvement to how the project is
+*perceived*, and Part 6 built the Canvas specifically so this is pure styling with no code.
+
+**What to do:** download a free font (Inter, Barlow and Manrope all suit this), create a **TMP
+Font Asset**, and set it on every text object. Pick three or four colours and use them
+consistently. Replace the flat panel Images with a 9-sliced sprite. Add `CanvasGroup` fades so
+panels don't pop.
+
+**Owner:** Isaiah (it's the same skill set as the DUX kiosk) · **Effort:** ~2–3 h
+
+**Done when:** no default Unity font remains anywhere.
+
+## Part 13 — Environment and atmosphere
+
+**Delivers:** night lighting with baked lightmaps, post-processing, four VFX, ambient NavMesh
+pedestrians, the guide/dog NPC, and the training-room scene.
+
+**Why it matters:** this is where most of the 3RT marks live, and where the two remaining
+required FSMs live. It's listed last because none of it blocks anything else — but the two
+NPCs are a **rubric requirement**, not a nice-to-have. Every team member needs one FSM.
+
+**Sub-items:**
+
+| Item | Owner | Rubric |
+|---|---|---|
+| `BystanderNPC` FSM (NavMesh witness) | Marcus | I3E — one FSM per member |
+| `GuideNPC` FSM (the stray dog) | Isaiah | I3E — one FSM per member, and the "dynamic NPC" the tutor asked for |
+| Ambient NavMesh crowd | Darryl | I3E — Unity Navigation |
+| Night lighting + baked lightmaps | Marcus | 3RT |
+| Post-processing beyond Bloom | Marcus | 3RT |
+| Four VFX | Marcus | 3RT — one per member |
+| Modelled car interior | Adam | 3RT |
+| Training room scene | Darryl | 3RT modular interior, STLD |
+
+**Effort:** this is the largest remaining block by far. Start the two NPC FSMs early — they are
+required, and they are small.
+
+## Part 14 — Documentation and submission
+
+**Delivers:** the finished ReadMe as PDF, FSM diagrams as images, credits, a tested standalone
+build, and every module's deliverables.
+
+**Why it matters:** every rubric requires it, and it is the one part that cannot be rushed on
+the final day.
+
+**Standing actions, do these now rather than later:**
+
+- **Record the `Pack_FREE_Cars` licence.** It has no source URL and no licence recorded. Both
+  I3E and 3RT require it. "It was free" is not a licence.
+- **Keep `Docs/I3E_ReadMe.md` current** as features land, and clear the `🔲` markers as you go.
+- **Build early and often.** A first build attempted on 12 August is how projects die.
+- **Everyone needs visible Git commits.** It's assessed.
+
+**Owner:** everyone · **Effort:** ~1 day, spread out
 
 ---
 
+## F.1 Suggested order
+
+Parts 7 and 9 are the two that most change how finished the game feels, and neither blocks the
+other. Part 13's two NPC FSMs are a hard rubric requirement, so **start those in parallel with
+whatever else is happening** — they're small, and they belong to Marcus and Isaiah, who aren't
+blocked by the Unity gameplay work.
+
+```
+Adam     ──► 7 (scoring)  ──► 9 (animation) ──► 8 (input) ──► 12/14
+Darryl   ──► 10 (vehicle) ──► 13 ambient crowd + training room
+Marcus   ──► 13 lighting / VFX / interior ──► BystanderNPC FSM
+Isaiah   ──► DUX kiosk ──► 12 (UI polish) ──► GuideNPC FSM
+```
 # PART G — Known traps, per part
 
 These are the specific things that will go wrong. I'm listing them now so that when they

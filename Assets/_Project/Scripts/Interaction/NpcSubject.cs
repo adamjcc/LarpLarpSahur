@@ -35,6 +35,12 @@ public class NpcSubject : MonoBehaviour, IInteractable
              "you are already sitting in.")]
     [SerializeField] private bool availableInPassengerSeat;
 
+    [Tooltip("ON for anything you approach on foot.\n\n" +
+             "Turn this OFF for the driver INSIDE the car — otherwise the ray can slip " +
+             "past the car's outer volume through a window and reach him from the street, " +
+             "which skips the passenger seat entirely.")]
+    [SerializeField] private bool availableInFreeRoam = true;
+
     [Header("Reach")]
     [SerializeField] private float maxDistance = 12f;
 
@@ -94,7 +100,7 @@ public class NpcSubject : MonoBehaviour, IInteractable
         {
             if (director == null) return true;
 
-            if (director.Phase == GamePhase.FreeRoam) return true;
+            if (director.Phase == GamePhase.FreeRoam) return availableInFreeRoam;
 
             // Only the driver himself is clickable once you're sitting in the car.
             // The car's outer volume must NOT be, or you'd re-enter the seat you're in.
@@ -151,8 +157,15 @@ public class NpcSubject : MonoBehaviour, IInteractable
             }
             else
             {
-                // No conversation authored yet — go straight to the replay so the flow
-                // is still testable.
+                // No conversation authored yet. Play the replay anyway so the flow isn't a
+                // dead end, but say loudly why the dialogue panel never appeared —
+                // silently doing something different is worse than doing nothing.
+                Debug.LogWarning(
+                    $"[NpcSubject] '{name}' has no DialogueSequence, so talking to " +
+                    $"{displayName} skipped straight to the POV replay.\n" +
+                    "   FIX: Add Component -> Dialogue Sequence on this object and fill in " +
+                    "the Lines array.", this);
+
                 PlayTheirReplay();
             }
         }
