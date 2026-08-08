@@ -1,9 +1,19 @@
 fileFormatVersion: 2
-guid: 4de41e671956c81419aecc09133c1253
+guid: 324678ad2c494704d8af410bd6f8a342
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Ri
+    second: {fileID: 2100000, guid: 44976ef24708fb848a6b4e31ba6ced94, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Ri2
+    second: {fileID: 2100000, guid: 482c817e5406ad642814b195b6c72ea5, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -12,23 +22,13 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: road2
+      name: Road2
     second: {fileID: 2100000, guid: 652c2ddf03d26d04499bd18d50e5bd07, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: road3
+      name: Road3
     second: {fileID: 2100000, guid: b801bcb7255c9c9469963bae72d965dd, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: roadisland1
-    second: {fileID: 2100000, guid: 44976ef24708fb848a6b4e31ba6ced94, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: roadisland2
-    second: {fileID: 2100000, guid: 482c817e5406ad642814b195b6c72ea5, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -58,7 +58,7 @@ ModelImporter:
     isReadable: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: 100
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
@@ -116,7 +116,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 100
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
