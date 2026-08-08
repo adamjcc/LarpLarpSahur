@@ -76,7 +76,7 @@ public class ScenarioDirector : MonoBehaviour
     /// A panel being open suspends it, so clicking a button cannot also re-trigger
     /// whatever object is sitting behind the panel.
     public bool CanInteract =>
-        !UIManager.ModalOpen &&
+        !UIManager.ModalBlockingInput &&
         (phase == GamePhase.FreeRoam ||
          phase == GamePhase.PassengerSeat ||
          phase == GamePhase.Intervene);
@@ -462,9 +462,11 @@ public class ScenarioDirector : MonoBehaviour
     // =====================================================================
     private void HandleDebugKeys()
     {
-        // A panel owns Enter, Q, Escape and right-click while it is open. Without this
-        // guard, dismissing a dialogue would also fire "back out of the passenger seat".
-        if (UIManager.ModalOpen) return;
+        // A panel owns Enter, Q, Escape and right-click while it is open, and for the rest
+        // of the frame it closes on. Without the frame part, pressing Q to dismiss a
+        // dialogue would ALSO eject you from the passenger seat, depending on which script
+        // Unity happened to update first.
+        if (UIManager.ModalBlockingInput) return;
 
         if (Input.GetKeyDown(KeyCode.Z)) EnterPhase(GamePhase.Observe);
         if (Input.GetKeyDown(KeyCode.X)) EnterPhase(GamePhase.FreeRoam);

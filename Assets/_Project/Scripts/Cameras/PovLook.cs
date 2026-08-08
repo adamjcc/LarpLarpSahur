@@ -67,6 +67,14 @@ public class PovLook : MonoBehaviour
 
     private void Update()
     {
+        // A free cursor means the player is pointing at UI, not looking around — a dialogue
+        // panel, the debrief, anything modal. Without this the camera keeps turning while
+        // you drag the mouse toward a button.
+        //
+        // This lives here rather than in PlayerRig because PovLook sits on the CAMERA, not
+        // on the player, so disabling the player's controller never reached it.
+        if (Cursor.lockState != CursorLockMode.Locked) return;
+
         // Mouse axes are already a per-frame delta, so they must NOT be multiplied
         // by Time.deltaTime. Doing that is the single most common mouse-look bug.
         float mouseX = Input.GetAxis("Mouse X") * sensitivity;

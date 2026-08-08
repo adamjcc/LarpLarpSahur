@@ -135,22 +135,21 @@ public class NpcSubject : MonoBehaviour, IInteractable
             return;
         }
 
-        // Sitting beside him in the car: clicking him plays his POV replay, and the
-        // director returns you to the passenger seat afterwards rather than the street.
-        if (director.Phase == GamePhase.PassengerSeat)
+        // Clicking the car from the street climbs into the seat beside the driver.
+        // The conversation itself happens on the NEXT click, once you're in there.
+        if (director.Phase == GamePhase.FreeRoam && talkFromPassengerSeat)
         {
-            director.PlayPovReplay(replayCamera);
+            director.EnterPassengerSeat();
             return;
         }
 
-        if (director.Phase == GamePhase.FreeRoam)
+        // Both remaining cases open the conversation: standing in front of her in the
+        // street, and sitting beside him in the car. The POV replay is reached from the
+        // dialogue's last page, never directly — the director sends you back to whichever
+        // of the two you started from.
+        if (director.Phase == GamePhase.FreeRoam || director.Phase == GamePhase.PassengerSeat)
         {
-            if (talkFromPassengerSeat)
-            {
-                // Talking to the driver means getting into the passenger seat beside him
-                director.EnterPassengerSeat();
-            }
-            else if (dialogue != null && UIManager.Instance != null)
+            if (dialogue != null && UIManager.Instance != null)
             {
                 // The last page of the conversation carries the "See what she saw" button.
                 UIManager.Instance.ShowDialogue(dialogue);

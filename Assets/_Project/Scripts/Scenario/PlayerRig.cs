@@ -59,6 +59,12 @@ public class PlayerRig : MonoBehaviour
         // pinned to the middle of the screen, which is the classic version of this bug.
         Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
         Cursor.visible = !locked;
+
+        // StarterAssetsInputs re-applies its OWN cursorLocked value whenever the window
+        // regains focus. Leaving the two out of step meant that alt-tabbing back into the
+        // game while sitting in the passenger seat silently freed the cursor — and now
+        // that PovLook requires a locked cursor, that would also stop the camera turning.
+        if (input != null) input.cursorLocked = locked;
     }
 
     /// Move the player somewhere.

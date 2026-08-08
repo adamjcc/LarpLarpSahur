@@ -72,6 +72,21 @@ public class UIManager : MonoBehaviour
     /// Safe to call before Awake has run anywhere.
     public static bool ModalOpen => Instance != null && Instance.IsModalOpen;
 
+    // The frame a panel last closed on.
+    private int modalClosedOnFrame = -1;
+
+    /// True while a panel is open AND for the rest of the frame it closes on.
+    ///
+    /// The extra frame matters. Script execution order between UIManager, the EventSystem
+    /// and PlayerInteractor is undefined, and Input.GetKeyDown / GetMouseButtonDown stay
+    /// true for the whole frame. Without this guard:
+    ///   · pressing Q to close a dialogue also ejected you from the passenger seat
+    ///   · clicking "Leave" also re-triggered the person behind the panel, reopening it
+    /// Both bugs would appear or vanish depending on the order Unity happened to pick.
+    public static bool ModalBlockingInput =>
+        Instance != null &&
+        (Instance.IsModalOpen || Instance.modalClosedOnFrame == Time.frameCount);
+
     // ---------------------------------------------------------------- lifecycle
 
     private void Awake()
@@ -292,6 +307,9 @@ public class UIManager : MonoBehaviour
     private void CloseModal()
     {
         IsModalOpen = false;
+
+        // Keep blocking input for the rest of this frame — see ModalBlockingInput
+        modalClosedOnFrame = Time.frameCount;
 
         // Hand control back to whatever the current phase wants — the director owns that
         // decision, so this never has to know whether we're walking or sitting in a car.
