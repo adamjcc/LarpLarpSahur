@@ -222,6 +222,11 @@ public class ScenarioDirector : MonoBehaviour
                 runner.Pause();
                 SetPlayerActive(false);
                 player.SetCursorLocked(false);   // so the Retry button is clickable
+
+                // Work out the result and fill the panel. Done here rather than in Update
+                // so it is computed exactly once, from the state the Resolve replay
+                // finished in — including whether the collision actually happened.
+                if (UIManager.Instance != null) UIManager.Instance.ShowDebrief();
                 break;
         }
     }
@@ -444,9 +449,24 @@ public class ScenarioDirector : MonoBehaviour
 
     /// "Try again" on the debrief screen. This is the ONLY thing that wipes the
     /// player's fixes — ResetScenario deliberately does not.
+    ///
+    /// The evidence ledger is cleared too. Without that, a second attempt would still count
+    /// everything you examined the first time as "found", and the debrief would praise you
+    /// for spotting things you never looked at this run.
     public void RetryFromStart()
     {
         if (interventions != null) interventions.ClearAll();
+
+        EvidenceLedger ledger = FindFirstObjectByType<EvidenceLedger>();
+        if (ledger != null) ledger.ClearAll();
+
+        // Bring back anything that hid itself when it was fixed. Include inactive, or the
+        // objects we most need to find are the exact ones we cannot see.
+        HazardInteractable[] hazards = FindObjectsByType<HazardInteractable>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        foreach (HazardInteractable h in hazards) h.RestoreVisual();
+
         EnterPhase(GamePhase.Observe);
     }
 

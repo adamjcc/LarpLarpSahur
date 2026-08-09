@@ -54,10 +54,20 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button replayButton;
     [SerializeField] private Button continueButton;
 
+    [Header("Debrief")]
+    [SerializeField] private GameObject debriefPanel;
+    [SerializeField] private TMP_Text debriefHeadline;
+    [SerializeField] private TMP_Text debriefGrade;
+    [SerializeField] private TMP_Text debriefBody;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private Color preventedColour = new Color(0.49f, 0.88f, 0.49f);
+    [SerializeField] private Color collidedColour = new Color(1f, 0.48f, 0.43f);
+
     [Header("References")]
     [SerializeField] private ScenarioDirector director;
     [SerializeField] private InterventionState interventions;
     [SerializeField] private PlayerInteractor interactor;
+    [SerializeField] private ScoreManager scoreManager;
 
     // ---------------------------------------------------------------- state
 
@@ -96,6 +106,9 @@ public class UIManager : MonoBehaviour
         if (director == null) director = FindFirstObjectByType<ScenarioDirector>();
         if (interventions == null) interventions = FindFirstObjectByType<InterventionState>();
         if (interactor == null) interactor = FindFirstObjectByType<PlayerInteractor>();
+        if (scoreManager == null) scoreManager = FindFirstObjectByType<ScoreManager>();
+
+        if (retryButton != null) retryButton.onClick.AddListener(() => director.RetryFromStart());
 
         if (examineCloseButton != null) examineCloseButton.onClick.AddListener(CloseExamine);
         if (dialogueNextButton != null) dialogueNextButton.onClick.AddListener(AdvanceDialogue);
@@ -107,6 +120,7 @@ public class UIManager : MonoBehaviour
         SetActive(examinePanel, false);
         SetActive(dialoguePanel, false);
         SetActive(observePanel, false);
+        SetActive(debriefPanel, false);
     }
 
     private void Update()
@@ -146,7 +160,9 @@ public class UIManager : MonoBehaviour
         }
 
         // ---- phase banner ----
-        SetActive(phaseBanner, !IsModalOpen);
+        // Hidden during the debrief: that panel carries its own headline, and the banner
+        // would sit on top of it.
+        SetActive(phaseBanner, !IsModalOpen && phase != GamePhase.Debrief);
         if (phaseTitle != null) phaseTitle.text = TitleFor(phase);
         if (phaseHint != null) phaseHint.text = HintFor(phase);
 
@@ -154,6 +170,11 @@ public class UIManager : MonoBehaviour
         // Only once the crash has finished playing, so they don't interrupt the shot.
         bool observeDone = phase == GamePhase.Observe && !director.IsObservationPlaying;
         SetActive(observePanel, observeDone);
+
+        // ---- debrief ----
+        // Driven from the phase, not from a modal flag: the debrief IS the whole screen
+        // at that point, so there is nothing behind it to protect.
+        SetActive(debriefPanel, phase == GamePhase.Debrief);
 
         // ---- intervene countdown ----
         bool intervening = phase == GamePhase.Intervene;
@@ -290,6 +311,31 @@ public class UIManager : MonoBehaviour
         activeDialogue = null;
         SetActive(dialoguePanel, false);
         CloseModal();
+    }
+
+    // ---------------------------------------------------------------- debrief
+
+    /// Called by the director when the Debrief phase opens. Asks the ScoreManager to work
+    /// out the result, then displays it.
+    public void ShowDebrief()
+    {
+        if (scoreManager == null)
+        {
+            Debug.LogError("[UIManager] No ScoreManager in the scene, so the debrief will " +
+                           "be blank. Add one to SYSTEMS.", this);
+            return;
+        }
+
+        scoreManager.Compute();
+
+        if (debriefHeadline != null)
+        {
+            debriefHeadline.text = scoreManager.Headline;
+            debriefHeadline.color = scoreManager.CollisionPrevented ? preventedColour : collidedColour;
+        }
+
+        if (debriefGrade != null) debriefGrade.text = scoreManager.GradeLine;
+        if (debriefBody != null) debriefBody.text = scoreManager.Body;
     }
 
     // ---------------------------------------------------------------- modal plumbing

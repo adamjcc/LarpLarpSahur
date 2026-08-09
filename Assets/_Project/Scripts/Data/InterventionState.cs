@@ -43,6 +43,13 @@ public class InterventionState : MonoBehaviour
     /// How many are needed in total. Used by the "2 / 4" HUD counter.
     public int RequiredCount => requiredHazards.Count;
 
+    /// The required hazards, in Inspector order. The debrief walks this to build its
+    /// report, so the order you type them in is the order they're explained.
+    public IReadOnlyList<HazardId> RequiredHazards => requiredHazards;
+
+    /// Everything the player changed, including things that made no difference.
+    public IEnumerable<HazardId> AllApplied => applied;
+
     /// True only when EVERY required hazard is fixed. This is the single condition that
     /// decides whether the collision is avoided.
     public bool AllRequiredFixed => CorrectCount >= requiredHazards.Count;

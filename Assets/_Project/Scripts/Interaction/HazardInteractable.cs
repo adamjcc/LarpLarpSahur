@@ -67,6 +67,17 @@ public class HazardInteractable : MonoBehaviour, IInteractable
     public string DisplayName => displayName;
     public string DebriefExplanation => debriefExplanation;
 
+    /// Puts a hidden object back. Called on Retry.
+    ///
+    /// Needed because "Hide When Applied" switches the GameObject off permanently. Some
+    /// props (her phone, her headphones) also get restored by PedestrianVictim.ResetToStart,
+    /// but anything NOT owned by an actor — a dropped bag, a dashboard item — would stay
+    /// invisible for the whole of the second attempt with nothing to bring it back.
+    public void RestoreVisual()
+    {
+        if (hideWhenApplied != null) hideWhenApplied.SetActive(true);
+    }
+
     private void Awake()
     {
         if (highlighter == null) highlighter = GetComponent<Highlighter>();
