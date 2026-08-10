@@ -6,3 +6,10 @@ NativeFormatImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146253
+  packageName: School assets
+  packageVersion: 1.0
+  assetPath: Assets/school/Prefabs/props/showcase.prefab
+  uploadId: 436609
