@@ -110,6 +110,11 @@ public class ScenarioRunner : MonoBehaviour
         {
             if (actors[i] != null) actors[i].ResetToStart();
         }
+
+        // Animator.Rebind() inside ResetToStart wipes the animator back to defaults, which
+        // can take animator.speed with it. Re-apply, or the first replay after a reset
+        // would run at full speed while the world around it crawls.
+        PushVisualTimeScale();
     }
 
     /// THE FAKE REWIND.

@@ -38,6 +38,7 @@ public enum HazardId
     PedestrianBag,
     PedestrianShoes,
     PedestrianHat,
+    PedestrianSodaCan,
 
     // In or on the car
     CarWipers,

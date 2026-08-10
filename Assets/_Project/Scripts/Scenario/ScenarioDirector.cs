@@ -37,6 +37,7 @@ public class ScenarioDirector : MonoBehaviour
     [SerializeField] private PlayerRig player;
     [SerializeField] private PlayerInteractor interactor;
     [SerializeField] private ImpactDetector impactDetector;
+    [SerializeField] private PedestrianVictim victim;
 
     [Header("Player positioning")]
     [Tooltip("Empty GameObject on the pavement where the player starts investigating.")]
@@ -119,6 +120,7 @@ public class ScenarioDirector : MonoBehaviour
         if (player == null) player = FindFirstObjectByType<PlayerRig>();
         if (interactor == null) interactor = FindFirstObjectByType<PlayerInteractor>();
         if (impactDetector == null) impactDetector = FindFirstObjectByType<ImpactDetector>();
+        if (victim == null) victim = FindFirstObjectByType<PedestrianVictim>();
     }
 
     private void Start()
@@ -138,6 +140,10 @@ public class ScenarioDirector : MonoBehaviour
         npcViewActive = false;
         if (interactor != null) interactor.ClearFocus();
 
+        // Default to playback presentation: she goes down on impact and stays down.
+        // Free Roam overrides this below, before its seek.
+        if (victim != null) victim.SetWitnessMode(false);
+
         Debug.Log($"<color=cyan>[PHASE]</color> -> <b>{next}</b>");
 
         switch (next)
@@ -153,11 +159,20 @@ public class ScenarioDirector : MonoBehaviour
 
             // -------------------------------------------------------------
             case GamePhase.FreeRoam:
+                // Order matters here.
+                //   BEFORE the seek: witness mode on, so re-running the collision doesn't
+                //                    trigger the fall animation again.
+                //   AFTER  the seek: place her on her standing spot, since the seek leaves
+                //                    her wherever the impact put her.
+                if (victim != null) victim.SetWitnessMode(true);
+
                 // The frozen aftermath IS just the scenario paused a couple of seconds
                 // after impact. Same objects, different clock value. No separate setup.
                 runner.SetTimeScale(1f);
                 runner.SeekTo(settings.FreeRoamTime);
                 runner.Pause();
+
+                if (victim != null) victim.ApplyWitnessPlacement();
 
                 cameras.Activate(CameraId.PlayerFirstPerson);
                 if (playerSpawnPoint != null) player.Teleport(playerSpawnPoint);
@@ -497,8 +512,8 @@ public class ScenarioDirector : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.M)) EnterPhase(GamePhase.Resolve);
         if (Input.GetKeyDown(KeyCode.K)) EnterPhase(GamePhase.Debrief);
 
-        // Enter = the "Next" button, so you can walk the whole loop with one key
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        // "Continue" = Enter or gamepad Start, so you can walk the whole loop with one input
+        if (GameInput.ContinuePressed)
         {
             switch (phase)
             {
@@ -509,18 +524,13 @@ public class ScenarioDirector : MonoBehaviour
             }
         }
 
-        // Back out of whatever you stepped into.
+        // Back out of whatever you stepped into. Bound to Q, right mouse and gamepad B.
         //
-        // Q, not Escape. The Unity EDITOR grabs Escape itself and force-releases the cursor
-        // lock every time you press it, so our code re-locks the cursor and the Editor
-        // immediately unlocks it again — which is why you had to click the Game view to get
-        // the cursor to go away. It only misbehaves in the Editor, never in a real build,
-        // but there is no reason to fight it. Escape still works as a backup.
-        bool backOut = Input.GetKeyDown(KeyCode.Q) ||
-                       Input.GetMouseButtonDown(1) ||
-                       Input.GetKeyDown(KeyCode.Escape);
-
-        if (backOut)
+        // Escape is deliberately NOT bound. The Unity Editor grabs Escape itself and
+        // force-releases the cursor lock, so our code re-locks it and the Editor unlocks it
+        // again — which is why it used to leave a stray cursor. Editor-only, but no reason
+        // to fight it.
+        if (GameInput.BackPressed)
         {
             if (npcViewActive) ExitNpcView();
             else if (phase == GamePhase.PassengerSeat) LeavePassengerSeat();

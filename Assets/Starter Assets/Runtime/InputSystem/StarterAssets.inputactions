@@ -60,6 +60,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "ToggleView",
+                    "type": "Button",
+                    "id": "1a7c4d20-9b31-4c88-a1f0-6d2e5b74c004",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -335,6 +343,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Continue",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2b8d5e31-ac42-4d99-b2e1-7e3f6c85d010",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardMouse",
+                    "action": "ToggleView",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2b8d5e31-ac42-4d99-b2e1-7e3f6c85d011",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "ToggleView",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

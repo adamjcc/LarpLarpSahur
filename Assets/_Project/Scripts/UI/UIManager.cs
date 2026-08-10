@@ -21,6 +21,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject crosshair;
     [SerializeField] private TMP_Text promptText;
 
+    [Tooltip("Optional. Shows '[F] hide the steering wheel' while sitting in the driver's seat.")]
+    [SerializeField] private TMP_Text obstructionHint;
+    [SerializeField] private PovObstructionToggle obstructionToggle;
+
     [Header("Phase banner")]
     [SerializeField] private GameObject phaseBanner;
     [SerializeField] private TMP_Text phaseTitle;
@@ -107,6 +111,7 @@ public class UIManager : MonoBehaviour
         if (interventions == null) interventions = FindFirstObjectByType<InterventionState>();
         if (interactor == null) interactor = FindFirstObjectByType<PlayerInteractor>();
         if (scoreManager == null) scoreManager = FindFirstObjectByType<ScoreManager>();
+        if (obstructionToggle == null) obstructionToggle = FindFirstObjectByType<PovObstructionToggle>();
 
         if (retryButton != null) retryButton.onClick.AddListener(() => director.RetryFromStart());
 
@@ -167,6 +172,14 @@ public class UIManager : MonoBehaviour
         // Only once the crash has finished playing, so they don't interrupt the shot.
         bool observeDone = phase == GamePhase.Observe && !director.IsObservationPlaying;
         SetActive(observePanel, observeDone);
+
+        // ---- "[F] hide the steering wheel", only while it would actually do something ----
+        if (obstructionToggle != null && obstructionHint != null)
+        {
+            bool showHint = obstructionToggle.IsAvailable && !IsModalOpen;
+            obstructionHint.gameObject.SetActive(showHint);
+            if (showHint) obstructionHint.text = $"[F]  {obstructionToggle.PromptLabel}";
+        }
 
         // ---- debrief ----
         // Driven from the phase, not from a modal flag: the debrief IS the whole screen

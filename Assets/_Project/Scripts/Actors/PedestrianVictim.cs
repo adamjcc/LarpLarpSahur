@@ -45,6 +45,46 @@ public class PedestrianVictim : PathScenarioActor
     [SerializeField] private GameObject phoneObject;
     [SerializeField] private GameObject headphonesObject;
 
+    [Header("Phone placement")]
+    [Tooltip("Where the phone sits while she is walking and typing. Local to whatever the " +
+             "phone is parented to, usually her hand bone.")]
+    [SerializeField] private Vector3 phoneWalkingPosition = new Vector3(0.0608f, -0.0066f, 0.0705f);
+    [SerializeField] private Vector3 phoneWalkingRotation = new Vector3(8.522f, -64.605f, 72.478f);
+
+    [Tooltip("Where it sits while she is standing still. The idle animation holds her arm " +
+             "differently, so a single position looks wrong in one pose or the other.")]
+    [SerializeField] private Vector3 phoneIdlePosition = new Vector3(-0.06606f, 0.169283f, 0.1135409f);
+    [SerializeField] private Vector3 phoneIdleRotation = new Vector3(27.208f, -102.513f, 99.772f);
+
+    // remembers which pose we last pushed, so we only move it when it actually changes
+    private bool lastPhoneWalking;
+
+    [Header("Her POV camera")]
+    [Tooltip("The PovLook on CAM_PedestrianPov. Its resting pitch follows her head: angled " +
+             "down at the phone while she's reading, level once she puts it away.")]
+    [SerializeField] private PovLook povLook;
+
+    [Tooltip("While she's reading. Pitch is positive DOWN, yaw is positive RIGHT — so " +
+             "32 / 15 means head down and turned slightly to her right.")]
+    [SerializeField] private float povPitchOnPhone = 32f;
+    [SerializeField] private float povYawOnPhone = 15f;
+
+    [Tooltip("Once the phone is away. 0 / 0 is level and straight ahead.")]
+    [SerializeField] private float povPitchLookingUp = 0f;
+    [SerializeField] private float povYawLookingUp = 0f;
+
+    // remembers the last pose we pushed, so we only touch the camera when it changes
+    private bool lastPhoneStowed;
+
+    [Header("Free Roam")]
+    [Tooltip("Where she stands as a witness during the investigation. Leave empty and she " +
+             "stays wherever the collision left her — which is usually the middle of the road.")]
+    [SerializeField] private Transform freeRoamStandPoint;
+
+    // True only during Free Roam. Suppresses the hit animation so she is found standing
+    // and talking rather than face-down in the road.
+    private bool witnessMode;
+
     [Header("Read-only")]
     [SerializeField] private State state = State.Walking;
     [SerializeField] private float timeInState;
@@ -65,6 +105,8 @@ public class PedestrianVictim : PathScenarioActor
     {
         if (!IsConfigured) return;
 
+        UpdatePovPitch();
+        UpdatePhonePose();
         timeInState += dt;
 
         switch (state)
@@ -139,6 +181,33 @@ public class PedestrianVictim : PathScenarioActor
         }
     }
 
+    /// Free Roam wants a witness standing up and able to talk. Every other phase is a
+    /// playback, where she should go down on impact and stay there.
+    ///
+    /// MUST be called BEFORE the director seeks. The seek re-runs the whole incident inside
+    /// one frame, so by the time it finishes the hit animation has already been triggered.
+    public void SetWitnessMode(bool witness)
+    {
+        witnessMode = witness;
+    }
+
+    /// Moves her to the spot she should be standing on during the investigation.
+    ///
+    /// MUST be called AFTER the seek, because the seek puts her back wherever the collision
+    /// left her. Safe to leave applying itself: the clock is paused in Free Roam, so Tick
+    /// never runs and nothing moves her back.
+    public void ApplyWitnessPlacement()
+    {
+        if (!witnessMode || freeRoamStandPoint == null) return;
+
+        transform.SetPositionAndRotation(freeRoamStandPoint.position, freeRoamStandPoint.rotation);
+        SetAnimFloat("Speed", 0f);
+
+        // She is standing here, not walking — and Tick won't run again while Free Roam
+        // has the clock paused, so this is the only chance to get the phone right.
+        UpdatePhonePose(force: true);
+    }
+
     /// Called by the ImpactDetector the moment the car reaches her.
     public void NotifyStruck()
     {
@@ -170,7 +239,10 @@ public class PedestrianVictim : PathScenarioActor
                 break;
 
             case State.Struck:
-                SetAnimTrigger("Hit");
+                // Skipped in witness mode. Free Roam re-simulates straight through the
+                // collision to reach the aftermath, so without this she would replay the
+                // fall every single time you cut back to the investigation.
+                if (!witnessMode) SetAnimTrigger("Hit");
                 break;
 
             case State.Safe:
@@ -195,6 +267,10 @@ public class PedestrianVictim : PathScenarioActor
         SetPhoneVisible(!phoneStowed);
         if (headphonesObject != null) headphonesObject.SetActive(!headphonesOff);
 
+        // force, because a reset must re-apply these even if the flags haven't changed
+        UpdatePovPitch(force: true);
+        UpdatePhonePose(force: true);
+
         // Rebind wipes the Animator back to its default state and clears every parameter.
         // Without this the second replay inherits the first replay's pose. Almost nobody
         // knows about this method and it causes hours of confusion.
@@ -203,6 +279,46 @@ public class PedestrianVictim : PathScenarioActor
             animator.Rebind();
             animator.Update(0f);
         }
+    }
+
+    /// Points her POV camera down at the phone, or level once she's put it away.
+    /// Only touches the camera when the state actually changes.
+    private void UpdatePovPitch(bool force = false)
+    {
+        if (povLook == null) return;
+
+        bool phoneStowed = HasIntervention(HazardId.PedestrianPhone);
+        if (!force && phoneStowed == lastPhoneStowed) return;
+
+        lastPhoneStowed = phoneStowed;
+
+        povLook.SetBaseRotation(
+            phoneStowed ? povPitchLookingUp : povPitchOnPhone,
+            phoneStowed ? povYawLookingUp   : povYawOnPhone);
+    }
+
+    /// True in the states where she is actually moving along the path.
+    private bool IsWalking =>
+        state == State.Walking || state == State.Distracted || state == State.Crossing;
+
+    /// Moves the phone between its walking pose and its standing pose.
+    ///
+    /// The texting animation and the idle animation hold her arm in completely different
+    /// places, so one fixed offset can only ever look right in one of them. Only touches
+    /// the transform when the pose actually changes.
+    private void UpdatePhonePose(bool force = false)
+    {
+        if (phoneObject == null) return;
+
+        bool walking = IsWalking;
+        if (!force && walking == lastPhoneWalking) return;
+
+        lastPhoneWalking = walking;
+
+        Transform t = phoneObject.transform;
+        t.localPosition = walking ? phoneWalkingPosition : phoneIdlePosition;
+        t.localRotation = Quaternion.Euler(walking ? phoneWalkingRotation : phoneIdleRotation);
+        // scale is left alone — set it once on the prefab
     }
 
     private void SetPhoneVisible(bool visible)

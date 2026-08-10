@@ -24,6 +24,7 @@ public class GameInput : MonoBehaviour
     private int interactFrame = -1;
     private int backFrame = -1;
     private int continueFrame = -1;
+    private int toggleViewFrame = -1;
 
     private Vector2 lookThisFrame;
 
@@ -51,15 +52,32 @@ public class GameInput : MonoBehaviour
             ? Instance.continueFrame == Time.frameCount
             : Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
 
-    /// Mouse movement since last frame, in pixels.
+    /// Mouse movement since last frame.
     ///
-    /// NOTE the scale difference: the old Input.GetAxis("Mouse X") returned a smoothed,
-    /// pre-scaled value around 0.1 per pixel, whereas this is the raw pixel delta. Anything
-    /// using it needs roughly a tenth of the old sensitivity.
+    /// TWO THINGS THIS IS NOT:
+    ///
+    /// 1. It is NOT the raw pixel delta. The Look binding carries
+    ///    ScaleVector2(x=0.05, y=0.05), so it arrives about half the size of the old
+    ///    Input.GetAxis value. Anything reading it wants roughly DOUBLE the old sensitivity.
+    ///
+    /// 2. Y is already INVERTED. The binding also carries InvertVector2(invertX=false),
+    ///    which leaves invertY at its default of true. That is why Starter Assets adds
+    ///    look.y to its pitch instead of subtracting it. Subtracting inverts it twice and
+    ///    the camera goes down when you push the mouse up.
+    ///
+    /// The fallback below reproduces both, so the feel is identical whether or not this
+    /// component is in the scene.
     public static Vector2 LookDelta =>
         Instance != null
             ? Instance.lookThisFrame
-            : new Vector2(Input.GetAxis("Mouse X") * 10f, Input.GetAxis("Mouse Y") * 10f);
+            : new Vector2(Input.GetAxis("Mouse X") * 0.5f, -Input.GetAxis("Mouse Y") * 0.5f);
+
+    /// F / gamepad Y — hide whatever is blocking the view. Only used in the driver's seat,
+    /// where the steering wheel sits between the camera and the pedals.
+    public static bool ToggleViewPressed =>
+        Instance != null
+            ? Instance.toggleViewFrame == Time.frameCount
+            : Input.GetKeyDown(KeyCode.F);
 
     /// Where the mouse cursor is, for the ray used when the cursor is unlocked.
     public static Vector2 PointerPosition =>
@@ -95,6 +113,11 @@ public class GameInput : MonoBehaviour
     public void OnContinue(InputValue value)
     {
         if (value.isPressed) continueFrame = Time.frameCount;
+    }
+
+    public void OnToggleView(InputValue value)
+    {
+        if (value.isPressed) toggleViewFrame = Time.frameCount;
     }
 
     public void OnLook(InputValue value)

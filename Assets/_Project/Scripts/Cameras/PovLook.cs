@@ -12,9 +12,12 @@ using UnityEngine;
 public class PovLook : MonoBehaviour
 {
     [Header("Sensitivity")]
-    [Tooltip("Raw pixel delta from the Input System, so this is roughly a TENTH of what " +
-             "the old Input.GetAxis value needed. 0.2 is a good starting point.")]
-    [SerializeField] private float sensitivity = 0.2f;
+    [Tooltip("The Look binding pre-scales by 0.05, so this wants roughly DOUBLE the old " +
+             "Input.GetAxis sensitivity. 4 is a good starting point.")]
+    [SerializeField] private float sensitivity = 4f;
+
+    [Tooltip("Tick if pushing the mouse forward should look DOWN.")]
+    [SerializeField] private bool invertY = false;
 
     [Header("Limits, in degrees from the resting direction")]
     // NOTE: named by what they DO, not by min/max. In Unity a positive X-rotation tilts
@@ -62,6 +65,25 @@ public class PovLook : MonoBehaviour
         Apply();
     }
 
+    /// Change where "straight ahead" is, at runtime.
+    ///
+    /// Used when the pedestrian puts her phone away: her head is angled down AND slightly
+    /// off to one side while she's reading, and both should return to level once she
+    /// looks up.
+    ///
+    /// pitchDegrees: positive looks DOWN.
+    /// yawDegrees:   positive looks RIGHT.
+    public void SetBaseRotation(float pitchDegrees, float yawDegrees)
+    {
+        captured = true;
+        baseRotation = Quaternion.Euler(pitchDegrees, yawDegrees, 0f);
+        yaw = 0f;
+        pitch = 0f;
+        Apply();
+    }
+
+    public void SetBasePitch(float pitchDegrees) => SetBaseRotation(pitchDegrees, 0f);
+
     private void OnEnable()
     {
         ResetLook();
@@ -85,7 +107,12 @@ public class PovLook : MonoBehaviour
         float mouseY = look.y * sensitivity;
 
         yaw += mouseX;
-        pitch -= mouseY;   // mouse forward = look up
+
+        // PLUS, not minus. The Look binding already carries InvertVector2, so look.y is
+        // negative when the mouse moves up. Subtracting it inverted the axis a second time,
+        // which is why pushing the mouse up sent the camera down. Starter Assets adds it
+        // for exactly the same reason.
+        pitch += invertY ? -mouseY : mouseY;
 
         // Positive pitch = looking DOWN, negative = looking UP.
         pitch = Mathf.Clamp(pitch, -maxLookUpAngle, maxLookDownAngle);

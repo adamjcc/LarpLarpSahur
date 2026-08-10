@@ -45,8 +45,12 @@ public class PlayerRig : MonoBehaviour
             input.JumpInput(false);
             input.SprintInput(false);
 
-            // Stop the mouse banking up rotation while we're in a POV camera
-            input.cursorInputForLook = enable;
+            // NOTE: cursorInputForLook is deliberately NOT switched off here.
+            //
+            // It gates StarterAssetsInputs.OnLook, and GameInput needs Look to keep arriving
+            // even while the player's body is frozen — that is exactly when PovLook is
+            // driving a POV camera. The FirstPersonController is disabled above, so nothing
+            // can move the player regardless.
             input.cursorLocked = enable;
         }
 
