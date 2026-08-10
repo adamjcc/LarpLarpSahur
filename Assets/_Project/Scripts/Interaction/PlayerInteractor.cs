@@ -59,7 +59,7 @@ public class PlayerInteractor : MonoBehaviour
             focused?.OnFocusEnter();
         }
 
-        if (focused != null && Input.GetMouseButtonDown(0))
+        if (focused != null && GameInput.InteractPressed)
         {
             focused.OnInteract();
         }
@@ -72,7 +72,7 @@ public class PlayerInteractor : MonoBehaviour
         //   cursor free     -> we're seated or in a POV, so aim wherever the mouse is
         Ray ray = Cursor.lockState == CursorLockMode.Locked
             ? cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f))
-            : cam.ScreenPointToRay(Input.mousePosition);
+            : cam.ScreenPointToRay(GameInput.PointerPosition);
 
         // QueryTriggerInteraction.Collide matters: every interaction collider is a trigger,
         // and by default raycasts ignore triggers. Remove this and nothing is ever clickable.

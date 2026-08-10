@@ -12,7 +12,9 @@ using UnityEngine;
 public class PovLook : MonoBehaviour
 {
     [Header("Sensitivity")]
-    [SerializeField] private float sensitivity = 2f;
+    [Tooltip("Raw pixel delta from the Input System, so this is roughly a TENTH of what " +
+             "the old Input.GetAxis value needed. 0.2 is a good starting point.")]
+    [SerializeField] private float sensitivity = 0.2f;
 
     [Header("Limits, in degrees from the resting direction")]
     // NOTE: named by what they DO, not by min/max. In Unity a positive X-rotation tilts
@@ -75,10 +77,12 @@ public class PovLook : MonoBehaviour
         // on the player, so disabling the player's controller never reached it.
         if (Cursor.lockState != CursorLockMode.Locked) return;
 
-        // Mouse axes are already a per-frame delta, so they must NOT be multiplied
-        // by Time.deltaTime. Doing that is the single most common mouse-look bug.
-        float mouseX = Input.GetAxis("Mouse X") * sensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
+        // Already a per-frame delta, so it must NOT be multiplied by Time.deltaTime.
+        // Doing that is the single most common mouse-look bug.
+        Vector2 look = GameInput.LookDelta;
+
+        float mouseX = look.x * sensitivity;
+        float mouseY = look.y * sensitivity;
 
         yaw += mouseX;
         pitch -= mouseY;   // mouse forward = look up

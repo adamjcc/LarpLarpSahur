@@ -37,6 +37,7 @@ public enum HazardId
     PedestrianUmbrella,
     PedestrianBag,
     PedestrianShoes,
+    PedestrianHat,
 
     // In or on the car
     CarWipers,
@@ -45,6 +46,7 @@ public enum HazardId
     CarSeatbelt,
     CarGloveBox,
     CarHandbrake,
+    CarGearStick,
 
     // Around the scene
     RoadSign,

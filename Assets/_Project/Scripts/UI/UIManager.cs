@@ -127,11 +127,8 @@ public class UIManager : MonoBehaviour
     {
         RefreshHud();
 
-        // Any of these dismisses an open panel, so the player never has to hunt for the button
-        if (IsModalOpen &&
-            (Input.GetKeyDown(KeyCode.Escape) ||
-             Input.GetKeyDown(KeyCode.Q) ||
-             Input.GetMouseButtonDown(1)))
+        // "Back" dismisses an open panel, so the player never has to hunt for the button
+        if (IsModalOpen && GameInput.BackPressed)
         {
             if (activeDialogue != null) CloseDialogue();
             else CloseExamine();
