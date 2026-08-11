@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 806825126136658943}
   m_Layer: 0
-  m_Name: CarProper
+  m_Name: CarDefault
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

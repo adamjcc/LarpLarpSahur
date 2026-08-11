@@ -10,10 +10,10 @@
 | Repository     | https://github.com/adamjcc/LarpLarpSahur              |
 | Main scene     | `Assets/Scenes/MainScene.unity`                       |
 
-| Modules | Links                                        |
-| ------- | -------------------------------------------- |
-| DUX     | Figma Wireframe · Proposal Doc               |
-| STLD    | Gameplay Walkthrough Video · Game Design Doc |
+| Modules | Links                                                                                                                             |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| DUX     | [Figma Wireframe](https://www.figma.com/design/oL2NMkQUYGt3H3hDnVynWE/DUX-IP2026?node-id=0-1&t=uROoYH6eHqK9znUz-1) · Proposal Doc |
+| STLD    | Gameplay Walkthrough Video · Game Design Doc                                                                                      |
 
 ---
 
@@ -240,7 +240,7 @@ These choices kept the experience clear, repeatable and suitable for a short cla
 | FREE Cartoon Car Pack - Simple Vehicles                             | Unity Asset Store, Standard Unity Asset Store EULA                                                                                               | Background and placeholder vehicle assets           |
 | Cinemachine, AI Navigation, Input System, Timeline and Universal RP | Unity Technologies, Unity Companion License                                                                                                      | Cameras, navigation, input, sequences and rendering |
 | Headphones Model                                                    | [User "~Drift~" on Sketchfab](https://skfb.ly/oRFAr), licensed under [Creative Commons Attribution](http://creativecommons.org/licenses/by/4.0/) | Player pedestrian character model                   |
-| Low Poly Mobile Phone                                                    | [User "kimmy.k" on Sketchfab](https://skfb.ly/owJHu), licensed under [Creative Commons Attribution](http://creativecommons.org/licenses/by/4.0/) | Player pedestrian character model                   |
+| Low Poly Mobile Phone                                               | [User "kimmy.k" on Sketchfab](https://skfb.ly/owJHu), licensed under [Creative Commons Attribution](http://creativecommons.org/licenses/by/4.0/) | Player pedestrian character model                   |
 
 The full asset list, exact source links and licence records are kept in `Docs/CREDITS.md`.
 
