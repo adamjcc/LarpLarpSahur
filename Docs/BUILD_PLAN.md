@@ -338,17 +338,21 @@ LAYER 2 — THE MEMORY  (knows about nothing)
 LAYER 3 — THE ACTORS  (know about layers 1 and 2)
    PedestrianVictim ....... FSM. Walks a path. Reads InterventionState to decide.
    IncidentVehicle ........ FSM. Drives a path. Reads InterventionState to decide.
-   ImpactSensor ........... trigger on the bumper, reports contact
+   ImpactDetector ......... deterministic distance check, NOT a trigger — see D.3
    DamageSwapper .......... swaps intact mesh for damaged mesh
    VehicleLights .......... turns the headlights on/off
 
 LAYER 4 — THE VIEW  (knows about layer 1)
-   CameraDirector ......... one method: Activate(CameraId)
+   CameraDirector ......... one method: Activate(CameraId, allowLook)
    PovLook ................ mouse-look with clamps, for POV cameras
    FollowPositionOnly ..... helper: copies a bone's position but not its rotation
+   PovObstructionToggle ... F hides the steering wheel inside the driver's POV
 
 LAYER 5 — THE INPUT  (knows about layers 2 and 4)
-   IInteractable .......... the contract: Prompt / IsAvailable / Focus / Interact
+   GameInput .............. the only place player input is read. Lives on the player,
+                            beside PlayerInput, because Send Messages only reaches
+                            components on its own GameObject.
+   IInteractable .......... the contract: Prompt / IsAvailable / MaxDistance / Focus / Interact
    PlayerInteractor ....... one raycast, routes to whatever it hits
    Highlighter ............ swaps materials to show "you can click this"
    HazardInteractable ..... a hazard or red herring. Implements IInteractable.
@@ -358,8 +362,9 @@ LAYER 6 — THE CONDUCTOR  (knows about everything)
    ScenarioDirector ....... the phase FSM. The spine of the whole game.
 
 LAYER 7 — THE SURFACE  (talked to by the director)
-   HudPrompt / PhaseHud / DialogueUI / DebriefUI
-   ScoreManager
+   UIManager .............. every panel and every piece of text. Nothing else touches UI.
+   DialogueSequence ....... a conversation, authored on the NPC in the Inspector
+   ScoreManager ........... reads the two ledgers, writes the debrief
 ```
 
 ## D.2 What each script actually does
@@ -726,51 +731,48 @@ ask to see it.
 **Done when:** talking to her opens a panel, clicking through reaches a "See what she saw"
 button, the replay plays, and control comes back correctly. ✅
 
+## ✅ Part 7 — Scoring and debrief
+
+**Delivers:** `ScoreManager`, the debrief screen, per-hazard explanation text.
+
+**Why it mattered:** this is where the educational payload actually lands, and it is the
+single biggest source of Delta Challenge marks. Everything before it sets up a lesson; this
+is the lesson. It was also nearly free to build, because `EvidenceLedger` and
+`InterventionState` had been recording since Part 4 — the debrief just reads them back.
+
+Keeping those two separate is what makes it worth reading. The report distinguishes a factor
+you **never noticed** from one you **noticed and walked away from**, and says something
+different about each.
+
+**Done when:** finishing with 2/4 names exactly which two you missed and why. ✅
+
+## ✅ Part 8 — Input Action Asset conversion
+
+**Delivers:** `Interact`, `Back`, `Continue` and `ToggleView` actions in
+`StarterAssets.inputactions`, plus a `GameInput` component the whole project reads from.
+
+**Why it mattered:** less than it looks for the rubric — Active Input Handling is "Both", so
+the old code worked. The real wins are gamepad support, one consistent look sensitivity
+instead of two, and no dependency on a project setting that could change.
+
+**The discovery that made it worth doing.** The `Look` binding carries
+`InvertVector2(invertX=false), ScaleVector2(x=0.05, y=0.05)`. Two consequences nobody would
+guess:
+
+- `invertY` defaults to **true**, so `look.y` is *already* negative when the mouse moves up.
+  That is why `FirstPersonController` adds it to pitch rather than subtracting. Subtracting
+  inverts it twice, which is exactly the "camera goes down when I push up" bug we hit.
+- The delta is pre-scaled by 0.05, so it arrives about **half** the old `Input.GetAxis` value
+  — not a tenth as first assumed. `PovLook` sensitivity wants roughly **4**.
+
+**Still on legacy input, deliberately:** `ScenarioDebugKeys`, the director's phase-jump
+letters, and `CompanionBrain`'s H key. All debug-only and stripped for the build. ✅
+
 ---
 
 # REMAINING
 
-## Part 7 — Scoring and debrief
-
-**Delivers:** `ScoreManager`, a debrief screen, and per-hazard explanation text.
-
-**Why it matters:** this is where the educational payload actually lands, and it is the single
-biggest source of Delta Challenge marks. Everything before it sets up a lesson; this is the
-lesson. It is also nearly free to build, because `EvidenceLedger` (what you examined) and
-`InterventionState` (what you changed) have been recording since Part 4 — the debrief just
-reads them back.
-
-The interesting part is that those two are separate. The debrief can distinguish a factor you
-**never noticed** from one you **noticed and chose to ignore**, and say something different
-about each. That distinction is worth more than a number.
-
-**Owner:** Adam · **Effort:** ~2–3 h
-
-**Done when:** finishing with 2/4 produces a screen naming exactly which two you missed, why
-each mattered, and what the safe behaviour would have been.
-
-## Part 8 — Input Action Asset conversion
-
-**Delivers:** `Interact`, `Back` and `Continue` actions added to `StarterAssets.inputactions`,
-a small `GameInput` component, and four scripts moved off legacy input.
-
-**Why it matters:** honestly, not much for the rubric — Active Input Handling is set to "Both",
-so what exists works. The real wins are gamepad support, rebindable controls, one consistent
-look sensitivity instead of two different ones, and dropping the legacy dependency entirely so
-the project can't break if that setting ever changes.
-
-**Deliberately scheduled after Part 7** because content is the critical path and swapping input
-mid-build adds risk for no deliverable.
-
-**One gotcha:** `PlayerRig.SetControlEnabled(false)` currently sets `cursorInputForLook = false`,
-which would zero the Look value exactly when a POV camera needs it. That line has to go.
-
-**Owner:** Adam · **Effort:** ~1 h (mostly Editor work)
-
-**Done when:** every control works from both keyboard/mouse and a gamepad, with no
-`Input.GetKey` left outside the debug scripts.
-
-## Part 9 — Character animation
+## Part 9 — Character animation  *(IN PROGRESS — clips being sourced)*
 
 **Delivers:** one custom Animator Controller, three Mixamo clips, applied to both characters.
 
@@ -802,9 +804,29 @@ controller has these parameters, the existing calls start working with **no code
 re-tune it against the texting animation — in Play mode, then Copy Component / Paste Component
 Values.
 
+**`HitReaction` must have NO exit transition.** She holds the last frame and stays down for
+the whole playback. `Animator.Rebind()` on reset returns her to Locomotion, so nothing sticks.
+
+### Already built for this part
+
+Three things landed early because the animation work exposed the need for them:
+
+- **Witness mode.** Free Roam re-simulates straight through the collision to reach the
+  aftermath, so the fall animation fired again on every camera change and she kept collapsing.
+  `PedestrianVictim.SetWitnessMode(true)` is now called *before* the seek and suppresses the
+  `Hit` trigger, so the investigation finds her standing and able to talk. Every other phase
+  keeps the fall.
+- **`Free Roam Stand Point`.** An empty Transform on `PedestrianVictim`. The seek leaves her
+  wherever the impact put her — usually the middle of the road — so `ApplyWitnessPlacement()`
+  runs *after* the seek and moves her somewhere sensible. Order matters in both directions.
+- **Two phone poses.** The texting clip and the idle clip hold her arm in completely
+  different places, so one fixed offset can only look right in one of them.
+  `Phone Walking Position/Rotation` and `Phone Idle Position/Rotation` on `PedestrianVictim`
+  swap automatically with her state.
+
 **Owner:** Adam + Marcus · **Effort:** ~3–4 h
 
-**Done when:** she walks while texting, stumbles on impact, and the driver sits properly — and
+**Done when:** she walks while texting, stumbles on impact, the driver sits properly — and
 the impact time is still identical run to run.
 
 ## Part 10 — Vehicle detail
@@ -856,6 +878,19 @@ wipers are set to intermittent. It hasn't rained all week."*
 
 **Done when:** there are at least six non-contributing objects across the pedestrian, the car
 and the street.
+
+### Related: the driver's obstruction toggle
+
+`PovObstructionToggle` on `VEHICLE_INCIDENT`. The driver sits close to the wheel, so the
+steering wheel and signal stalk sit between the camera and the pedals — the brake pedal
+simply cannot be clicked. **F** (or gamepad Y) hides whatever is dragged into its
+`Obstructions` array, and only while the driver's POV is live. It restores them automatically
+on the way out, or you would climb out of the car and find the steering wheel missing for the
+rest of the game.
+
+Moving the camera back would have fixed the raycast and ruined the framing. This fixes both,
+and reads as a deliberate feature: an analyst stripping away the parts of a reconstruction
+that are in the way.
 
 ## Part 12 — UI polish
 
@@ -927,11 +962,17 @@ whatever else is happening** — they're small, and they belong to Marcus and Is
 blocked by the Unity gameplay work.
 
 ```
-Adam     ──► 7 (scoring)  ──► 9 (animation) ──► 8 (input) ──► 12/14
-Darryl   ──► 10 (vehicle) ──► 13 ambient crowd + training room
+Adam     ──► 9 (animation) ──► 11 (extra interactables) ──► 14
+Darryl   ──► 10 (vehicle)  ──► 13 ambient crowd + training room
 Marcus   ──► 13 lighting / VFX / interior ──► BystanderNPC FSM
 Isaiah   ──► DUX kiosk ──► 12 (UI polish) ──► GuideNPC FSM
 ```
+
+**Two things that are late and shouldn't be.** `Pack_FREE_Cars` still has no recorded source
+or licence, and the Bystander and Guide FSMs are a rubric requirement rather than polish.
+Isaiah has started `CompanionBrain` (the dog) with `FollowingPlayer` / `LeadingToClue` states
+— its `FindUnexaminedClue()` has a TODO to ask the ledger instead of cycling an array, and
+`EvidenceLedger.Has(id)` and `.All` are ready for it.
 # PART G — Known traps, per part
 
 These are the specific things that will go wrong. I'm listing them now so that when they
@@ -1004,6 +1045,37 @@ happen you recognise them in thirty seconds instead of an evening.
   `InterventionState`. It must not. Only the Retry button clears it.
 - **The headlights are off at the start of the Resolve replay.** Each actor's `ResetToStart()`
   needs to read `InterventionState` and set its starting visual state accordingly.
+
+## Parts 6–9 — traps we actually hit
+
+These all cost real time. Every one is fixed, but the shape of them repeats.
+
+- **Empty GameObjects inside a Canvas default to a 100×100 rect anchored to the centre.**
+  A child's anchor is relative to its *parent's* rect, not the screen — so "top-centre" on a
+  child of an unstretched container anchors to the top of a small box floating in the middle
+  of the screen. Set every container to full stretch first.
+- **TextMeshPro can only draw glyphs in its font atlas.** The default LiberationSans SDF has
+  no tick, cross, middle dot or em dash. They render as empty boxes. Every runtime-generated
+  string in `ScoreManager` is plain ASCII for exactly this reason.
+- **`Input.GetKeyDown` stays true for the whole frame, and script execution order is
+  undefined.** Closing a panel with Q also ejected you from the passenger seat; clicking
+  "Leave" also re-triggered the person behind the panel. `UIManager.ModalBlockingInput` stays
+  true for the rest of the frame a panel closes on, which is what fixes both.
+- **`PovLook` lives on the camera, not the player**, so `SetControlEnabled(false)` never
+  reached it and the camera kept turning behind an open dialogue. It now bails whenever the
+  cursor is unlocked.
+- **`StarterAssetsInputs` re-applies its own `cursorLocked` on window focus.** Leaving that
+  out of step with the real cursor meant alt-tabbing back in silently freed the mouse.
+  `PlayerRig.SetCursorLocked` keeps both in sync.
+- **Unity's positive X-rotation is nose-DOWN.** A field called `minPitch = -70` was therefore
+  the *up* limit, not the down one — which is why the brake pedal at 58° below the eyeline was
+  unreachable behind a 45° cap. `PovLook`'s fields are named for what they do now.
+- **Props hidden by `Hide When Applied` stay hidden after Retry** unless something puts them
+  back. `RetryFromStart` calls `RestoreVisual()` on every hazard, searching inactive objects
+  included — the ones you need are precisely the ones you cannot see.
+- **A seek re-runs the whole incident inside one frame**, so anything triggered during the
+  crash fires again on every camera change. That is what made the pedestrian collapse
+  repeatedly, and why witness mode has to be set *before* the seek.
 
 ## Always
 - **Never move or rename assets in Windows Explorer.** Do it inside Unity, or the `.meta` file
@@ -1092,7 +1164,39 @@ already accounted for.
 | `Mobile Phone` | `mixamorig:Spine2` | pos `-2.02835, 0.11979, 0.92591` · rot `24.476, -180, 0` · scale `0.4` · BoxCollider centre `0,0.44,0` size `0.6,0.6,0.6` |
 | `Interact_Body` | `PEDESTRIAN_VICTIM` | pos `0,0.75,0` · Capsule radius `0.28` height `1.35` (spans y 0.075–1.425, stops below the chin) |
 | `POV_Anchor` | `PEDESTRIAN_VICTIM` | `FollowPositionOnly` → target `mixamorig:Head` |
-| `CAM_PedestrianPov` | `POV_Anchor` | pos `0, 0, 0.12` · rotation `35, 0, 0` |
+| `CAM_PedestrianPov` | `POV_Anchor` | pos `0, 0, 0.12` · **rotation is driven at runtime, see below** |
+
+## Runtime-driven values on `PedestrianVictim`
+
+These are no longer authored on the object itself — the script pushes them, so editing the
+Transform directly will just get overwritten.
+
+| Field | Value | When |
+|---|---|---|
+| Pov Pitch / Yaw On Phone | `32` / `15` | while she is reading — head down, turned slightly right |
+| Pov Pitch / Yaw Looking Up | `0` / `0` | once the phone is stowed |
+| Phone Walking Position | `0.0608, -0.0066, 0.0705` | Walking · Distracted · Crossing |
+| Phone Walking Rotation | `8.522, -64.605, 72.478` | " |
+| Phone Idle Position | `-0.06606, 0.169283, 0.1135409` | every other state, including the Free Roam witness pose |
+| Phone Idle Rotation | `27.208, -102.513, 99.772` | " |
+| Phone scale | `0.4` | set once on the prefab, never touched by script |
+
+To re-tune either phone pose: **enter Play mode**, drag it while that animation is running,
+right-click Transform → **Copy Component**, exit Play → **Paste Component Values**, then copy
+the numbers into the matching pair of fields. Tuning against the bind pose is what produced
+the original wrong angle.
+
+## Input
+
+| Action | Keyboard / Mouse | Gamepad |
+|---|---|---|
+| `Interact` | Left Mouse · E | A |
+| `Back` | Q · Right Mouse | B |
+| `Continue` | Enter · Numpad Enter | Start |
+| `ToggleView` | F | Y |
+
+`PovLook` **Sensitivity = 4** on all POV cameras. The `Look` binding pre-scales by 0.05, so
+this is roughly double the old `Input.GetAxis` value, not a tenth.
 
 The phone's odd local position is normal — Mixamo bones carry baked rotations and scales, so
 local coordinates under `Spine2` do not read like world space. Re-parent it to
