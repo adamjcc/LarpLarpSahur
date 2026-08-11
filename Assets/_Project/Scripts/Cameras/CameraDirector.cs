@@ -1,8 +1,19 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * CameraDirector.cs
+ * Switches between the game's Cinemachine camera angles.
+ */
+
 using System;
 using Unity.Cinemachine;
 using UnityEngine;
 
+/// <summary>
 /// Names for every camera angle in the game.
+/// </summary>
 public enum CameraId
 {
     BirdsEye,           // the opening overhead shot
@@ -13,6 +24,7 @@ public enum CameraId
     Resolve             // the cinematic "what if" replay at the end
 }
 
+/// <summary>
 /// Switches between camera angles.
 ///
 /// HOW CINEMACHINE WORKS, because this trips up everyone:
@@ -23,7 +35,8 @@ public enum CameraId
 /// Whichever active CinemachineCamera has the highest Priority wins, and the Brain moves the
 /// real camera to match it. So "switching cameras" just means changing which one is highest.
 ///
-/// >>> ALL RAYCASTS COME FROM Camera.main, ALWAYS. <<<
+/// ALL RAYCASTS COME FROM Camera.main, ALWAYS.
+/// </summary>
 public class CameraDirector : MonoBehaviour
 {
     [Serializable]
@@ -43,6 +56,7 @@ public class CameraDirector : MonoBehaviour
 
     public CameraId Current { get; private set; }
 
+    /// <summary>
     /// Make one camera live and everything else stand by.
     ///
     /// allowLook decides whether the player may move this camera with the mouse.
@@ -52,6 +66,7 @@ public class CameraDirector : MonoBehaviour
     ///                               That is the entire point of the shot.
     ///   Stepping into her eyes   -> allowLook TRUE, so you can look down at her phone.
     ///   during Intervene
+    /// </summary>
     public void Activate(CameraId id, bool allowLook = true)
     {
         Current = id;
@@ -87,8 +102,10 @@ public class CameraDirector : MonoBehaviour
         return null;
     }
 
+    /// <summary>
     /// Warns once at startup about anything you forgot to drag in, rather than letting you
     /// find out when a phase silently shows the wrong angle.
+    /// </summary>
     private void Start()
     {
         foreach (CameraId id in Enum.GetValues(typeof(CameraId)))

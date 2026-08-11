@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * FollowPositionOnly.cs
+ * Follows a bone's position without inheriting its rotation.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Copies a target's POSITION every frame but never its rotation.
 ///
 /// WHY THIS EXISTS. The pedestrian's free-look POV camera needs to sit at her head, but if
@@ -12,6 +22,7 @@ using UnityEngine;
 ///
 /// LateUpdate, not Update, because animation is applied during Update — reading the bone
 /// any earlier gives you last frame's pose.
+/// </summary>
 public class FollowPositionOnly : MonoBehaviour
 {
     [Tooltip("Usually a head bone, e.g. mixamorig:Head.")]

@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * NpcSubject.cs
+ * A person the player can talk to or see through the eyes of.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// "Talk to this person" in Free Roam, "get inside their head" during Intervene.
 ///
 /// One component, two behaviours, picked by asking the director what phase we are in.
@@ -8,6 +18,7 @@ using UnityEngine;
 /// On the pedestrian this sits on Interact_Body, whose capsule stops at her NECK. Her head
 /// has its own small collider for the headphones. Because Physics.Raycast returns the
 /// NEAREST hit, aiming at her head gets the headphones and aiming anywhere else gets this.
+/// </summary>
 public class NpcSubject : MonoBehaviour, IInteractable
 {
     public enum Subject { Pedestrian, Driver }
@@ -170,7 +181,9 @@ public class NpcSubject : MonoBehaviour, IInteractable
         }
     }
 
+    /// <summary>
     /// Called by the dialogue panel's "See what they saw" button in Part 5.
+    /// </summary>
     public void PlayTheirReplay()
     {
         if (director != null) director.PlayPovReplay(replayCamera);

@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * ImpactDetector.cs
+ * Decides the exact moment the car reaches the pedestrian.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Decides when the car has reached the pedestrian.
 ///
 /// WHY THIS IS NOT A TRIGGER COLLIDER
@@ -14,6 +24,7 @@ using UnityEngine;
 /// physics engine for its own sake.
 ///
 /// TickOrder = 100 so this runs AFTER the car and the pedestrian have both moved this step.
+/// </summary>
 public class ImpactDetector : ScenarioActor
 {
     [SerializeField] private PedestrianVictim pedestrian;
@@ -25,15 +36,19 @@ public class ImpactDetector : ScenarioActor
 
     [SerializeField] private bool logToConsole = true;
 
+    /// <summary>
     /// Set while the director is running a silent dry-run to predict the impact time.
     /// Stops that prediction pass from spamming a second IMPACT line into the Console.
+    /// </summary>
     public bool Silent { get; set; }
 
     [Header("Read-only")]
     [SerializeField] private bool hasImpacted;
     [SerializeField] private float impactedAtTime = -1f;
 
+    /// <summary>
     /// Scenario time the collision happened, or -1 if it didn't. Read by the debrief.
+    /// </summary>
     public float ImpactedAtTime => impactedAtTime;
     public bool HasImpacted => hasImpacted;
 

@@ -1,9 +1,20 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * VehicleLights.cs
+ * Turns the car headlights on and off.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Turns the headlights on and off. Deliberately tiny.
 ///
 /// In Part 6 the headlight button inside the car calls SetOn(true) through a UnityEvent you
 /// wire up in the Inspector — no extra code needed.
+/// </summary>
 public class VehicleLights : MonoBehaviour
 {
     [Tooltip("Drag the headlight Light components in here. Two spot lights is plenty.")]
@@ -36,8 +47,10 @@ public class VehicleLights : MonoBehaviour
         }
     }
 
+    /// <summary>
     /// Parameterless version, because UnityEvent buttons in the Inspector are easiest to
     /// wire up when the method takes nothing.
+    /// </summary>
     public void TurnOn() => SetOn(true);
 
     public void TurnOff() => SetOn(false);

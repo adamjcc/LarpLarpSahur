@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * AmbientVehicle.cs
+ * Background traffic that loops a waypoint route and brakes for obstacles.
+ */
+
 using UnityEngine;
 
 public class AmbientVehicle : MonoBehaviour

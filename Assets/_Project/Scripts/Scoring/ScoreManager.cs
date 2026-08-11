@@ -1,8 +1,19 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * ScoreManager.cs
+ * Works out the player's result and writes the debrief.
+ */
+
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
+/// <summary>
 /// How well the player did.
+/// </summary>
 public enum OutcomeGrade
 {
     TryAgain,
@@ -11,6 +22,7 @@ public enum OutcomeGrade
     Excellent
 }
 
+/// <summary>
 /// Works out the result and writes the debrief.
 ///
 /// This is where the whole game finally says what it means, and it costs almost nothing to
@@ -27,6 +39,7 @@ public enum OutcomeGrade
 /// The per-hazard wording lives on the HazardInteractable components out in the scene, not
 /// duplicated here — this collects them at startup. Write the text once, next to the object
 /// it describes.
+/// </summary>
 public class ScoreManager : MonoBehaviour
 {
     [Header("Wiring — auto-found if left empty")]
@@ -71,11 +84,13 @@ public class ScoreManager : MonoBehaviour
         BuildHazardLookup();
     }
 
+    /// <summary>
     /// Collects every hazard in the scene so the debrief can quote its wording.
     ///
     /// FindObjectsInactive.Include matters: a hazard the player has already fixed may have
     /// hidden itself (the phone disappears when she pockets it), and a disabled hazard
     /// would otherwise vanish from the report exactly when it's most relevant.
+    /// </summary>
     private void BuildHazardLookup()
     {
         hazardLookup.Clear();
@@ -98,7 +113,9 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
+    /// <summary>
     /// Called by the director the moment the debrief opens.
+    /// </summary>
     public void Compute()
     {
         if (interventions == null)

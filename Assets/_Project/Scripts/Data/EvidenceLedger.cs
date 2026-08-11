@@ -1,6 +1,16 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * EvidenceLedger.cs
+ * Remembers which hazards the player has examined.
+ */
+
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
 /// Remembers which hazards the player has EXAMINED (as opposed to fixed).
 ///
 /// Two separate ideas, kept in two separate places:
@@ -10,6 +20,7 @@ using UnityEngine;
 /// The debrief uses both: it can tell the difference between a factor you never noticed and
 /// one you noticed but chose not to act on. That distinction is the interesting part of the
 /// feedback, so it is worth the extra ten lines.
+/// </summary>
 public class EvidenceLedger : MonoBehaviour
 {
     [Header("Read-only — watch this fill up while you play")]
@@ -21,8 +32,10 @@ public class EvidenceLedger : MonoBehaviour
     public bool Has(HazardId id) => examined.Contains(id);
     public IEnumerable<HazardId> All => examined;
 
+    /// <summary>
     /// Returns TRUE only the first time, so the caller knows whether to award points
     /// or play a discovery sound.
+    /// </summary>
     public bool Record(HazardId id)
     {
         bool isNew = examined.Add(id);

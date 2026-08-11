@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PovLook.cs
+ * Mouse look with limits, used by the point-of-view cameras.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Mouse-look for the POV cameras, with limits so the player can't spin round and see
 /// through the back of someone's head.
 ///
@@ -9,6 +19,7 @@ using UnityEngine;
 ///
 /// It rotates its own LOCAL rotation, so it works correctly when the camera is a child of a
 /// moving anchor (the car, or a POV_Free follower on the pedestrian).
+/// </summary>
 public class PovLook : MonoBehaviour
 {
     [Header("Sensitivity")]
@@ -55,8 +66,10 @@ public class PovLook : MonoBehaviour
         captured = true;
     }
 
+    /// <summary>
     /// Snap back to the resting direction. Called when this camera becomes live, so you
     /// never inherit where you happened to be looking last time.
+    /// </summary>
     public void ResetLook()
     {
         CaptureBase();
@@ -65,6 +78,7 @@ public class PovLook : MonoBehaviour
         Apply();
     }
 
+    /// <summary>
     /// Change where "straight ahead" is, at runtime.
     ///
     /// Used when the pedestrian puts her phone away: her head is angled down AND slightly
@@ -73,6 +87,7 @@ public class PovLook : MonoBehaviour
     ///
     /// pitchDegrees: positive looks DOWN.
     /// yawDegrees:   positive looks RIGHT.
+    /// </summary>
     public void SetBaseRotation(float pitchDegrees, float yawDegrees)
     {
         captured = true;

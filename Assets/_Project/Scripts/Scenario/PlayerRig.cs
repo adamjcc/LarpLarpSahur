@@ -1,11 +1,22 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PlayerRig.cs
+ * Wrapper around the Starter Assets first person controller.
+ */
+
 using StarterAssets;
 using UnityEngine;
 
+/// <summary>
 /// A thin wrapper around the Starter Assets first-person controller.
 ///
 /// The ScenarioDirector only ever says "give the player control" or "take it away". All the
 /// fiddly Starter Assets details live in here, so if you ever swap the controller out, this
 /// is the only file that changes.
+/// </summary>
 public class PlayerRig : MonoBehaviour
 {
     [SerializeField] private FirstPersonController controller;
@@ -29,7 +40,9 @@ public class PlayerRig : MonoBehaviour
             Debug.LogError("[PlayerRig] No FirstPersonController found on this object.", this);
     }
 
+    /// <summary>
     /// Turn walking and looking on or off.
+    /// </summary>
     public void SetControlEnabled(bool enable)
     {
         ControlEnabled = enable;
@@ -71,11 +84,13 @@ public class PlayerRig : MonoBehaviour
         if (input != null) input.cursorLocked = locked;
     }
 
+    /// <summary>
     /// Move the player somewhere.
     ///
     /// A CharacterController overwrites transform.position every frame it is enabled, so
     /// setting the position directly silently does nothing. Disabling it for one frame is
     /// the only reliable way to teleport one, and almost nobody knows this.
+    /// </summary>
     public void Teleport(Vector3 position, Quaternion rotation)
     {
         bool wasEnabled = characterController != null && characterController.enabled;

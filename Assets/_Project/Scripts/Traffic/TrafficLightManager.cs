@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * TrafficLightManager.cs
+ * Cycles the junction's traffic lights between green, yellow and red.
+ */
+
 using UnityEngine;
 
 public class TrafficLightManager : MonoBehaviour

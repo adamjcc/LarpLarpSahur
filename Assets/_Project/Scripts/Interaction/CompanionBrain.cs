@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * CompanionBrain.cs
+ * State machine for the companion that guides the player to clues.
+ */
+
 using UnityEngine;
 using UnityEngine.AI;
 

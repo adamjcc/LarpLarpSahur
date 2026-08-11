@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * Highlighter.cs
+ * Makes an object glow while the player is looking at it.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Makes an object glow while the player is looking at it, then puts it back exactly
 /// as it was.
 ///
@@ -12,6 +22,7 @@ using UnityEngine;
 ///
 /// So this caches every renderer's full material array up front and restores it byte for
 /// byte, using sharedMaterials throughout.
+/// </summary>
 public class Highlighter : MonoBehaviour
 {
     [SerializeField] private Material highlightMaterial;

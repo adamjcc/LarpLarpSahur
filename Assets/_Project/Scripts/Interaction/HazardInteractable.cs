@@ -1,21 +1,39 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * HazardInteractable.cs
+ * A hazard or red herring the player can examine and change.
+ */
+
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
 /// Where the player must be standing to CHANGE this hazard.
 /// (Examining it in Free Roam is always allowed if you can see it.)
+/// </summary>
 public enum HazardAccess
 {
+    /// <summary>
     /// Reachable from anywhere. Used for red herrings like the umbrella.
+    /// </summary>
     Both,
 
+    /// <summary>
     /// Only from inside that person's eyes. Her phone; every dashboard control.
+    /// </summary>
     FromPovOnly,
 
+    /// <summary>
     /// Only from outside, looking at them. Her headphones — nobody can see
     /// their own ears, so this is the one that has to work from the outside.
+    /// </summary>
     FromOutsideOnly
 }
 
+/// <summary>
 /// ONE component for all eight clickable hazards and red herrings.
 ///
 /// Its behaviour changes with the phase, which is the whole trick:
@@ -24,6 +42,7 @@ public enum HazardAccess
 ///                 objects are interactive, before it matters.
 ///   INTERVENE  -> clicking FIXES it. Records it in InterventionState and fires onApplied,
 ///                 which you wire up in the Inspector with no code at all.
+/// </summary>
 public class HazardInteractable : MonoBehaviour, IInteractable
 {
     [Header("Identity")]
@@ -67,12 +86,14 @@ public class HazardInteractable : MonoBehaviour, IInteractable
     public string DisplayName => displayName;
     public string DebriefExplanation => debriefExplanation;
 
+    /// <summary>
     /// Puts a hidden object back. Called on Retry.
     ///
     /// Needed because "Hide When Applied" switches the GameObject off permanently. Some
     /// props (her phone, her headphones) also get restored by PedestrianVictim.ResetToStart,
     /// but anything NOT owned by an actor — a dropped bag, a dashboard item — would stay
     /// invisible for the whole of the second attempt with nothing to bring it back.
+    /// </summary>
     public void RestoreVisual()
     {
         if (hideWhenApplied != null) hideWhenApplied.SetActive(true);
@@ -157,7 +178,9 @@ public class HazardInteractable : MonoBehaviour, IInteractable
 
     // ---------------------------------------------------------------- behaviour
 
+    /// <summary>
     /// Free Roam: read about it, and remember that we did.
+    /// </summary>
     private void Examine()
     {
         if (ledger != null) ledger.Record(hazardId);
@@ -172,7 +195,9 @@ public class HazardInteractable : MonoBehaviour, IInteractable
         }
     }
 
+    /// <summary>
     /// Intervene: actually change it.
+    /// </summary>
     private void Apply()
     {
         if (interventions == null) return;
@@ -189,12 +214,20 @@ public class HazardInteractable : MonoBehaviour, IInteractable
         Debug.Log($"<color=lime>[FIXED]</color> <b>{displayName}</b> ({tag})   " +
                   $"{interventions.CorrectCount}/{interventions.RequiredCount}");
 
-        // Tell the player plainly when they've changed something that was never going to
-        // matter. Without this, a red herring feels identical to a real fix and the
-        // counter silently refusing to move just reads as a bug.
-        if (isRedHerring && UIManager.Instance != null)
+        if (UIManager.Instance == null) return;
+
+        if (isRedHerring)
         {
+            // Say plainly that this one changed nothing. Without it, a red herring feels
+            // identical to a real fix and the counter silently refusing to move just
+            // reads as a bug.
             UIManager.Instance.ShowNoEffect(displayName);
+        }
+        else if (interventions.IsRequired(hazardId))
+        {
+            // A quick well done for one of the four that actually mattered
+            UIManager.Instance.ShowHazardFound(
+                displayName, interventions.CorrectCount, interventions.RequiredCount);
         }
     }
 }

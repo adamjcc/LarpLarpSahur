@@ -1,7 +1,18 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PhaseHudPlaceholder.cs
+ * DEBUG - temporary on-screen phase display, replaced by the Canvas.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// TEMPORARY on-screen display for Part 3, drawn with OnGUI so it needs zero setup.
 /// A real Canvas with proper text replaces this in Part 5. Delete it then.
+/// </summary>
 public class PhaseHudPlaceholder : MonoBehaviour
 {
     [SerializeField] private ScenarioDirector director;

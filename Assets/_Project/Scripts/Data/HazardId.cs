@@ -1,3 +1,13 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * HazardId.cs
+ * Names every hazard and red herring in the scenario.
+ */
+
+/// <summary>
 /// Every clickable contributing factor and red herring in the scenario.
 ///
 /// One enum covers both meanings: it names the thing the player LOOKS at, and it names the
@@ -7,6 +17,7 @@
 /// An enum is just a fixed list of named options. Using one instead of loose strings means
 /// Unity gives you a dropdown in the Inspector and typos become compile errors instead of
 /// silent bugs.
+/// </summary>
 public enum HazardId
 {
     // ---- Pedestrian: real contributing factors ----

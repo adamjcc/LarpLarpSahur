@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * NPCBrain.cs
+ * OLD PROTOTYPE - superseded by AmbientPedestrian. Kept for reference.
+ */
+
 using UnityEngine;
 using UnityEngine.AI;
 

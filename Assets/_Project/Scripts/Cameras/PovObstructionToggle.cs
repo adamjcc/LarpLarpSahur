@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PovObstructionToggle.cs
+ * Hides whatever blocks the view inside a point-of-view camera.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Lets the player hide whatever is physically in the way while they are inside a POV.
 ///
 /// The driver's seat has a real problem: he sits close to the wheel, so the steering wheel
@@ -9,6 +19,7 @@ using UnityEngine;
 /// stripping away the parts of the reconstruction that are in the way.
 ///
 /// Put this on VEHICLE_INCIDENT and drag the steering wheel and signal lever into the array.
+/// </summary>
 public class PovObstructionToggle : MonoBehaviour
 {
     [Tooltip("Objects to hide. Their colliders go too, so anything behind them becomes " +
@@ -28,14 +39,18 @@ public class PovObstructionToggle : MonoBehaviour
 
     private bool obstructionsHidden;
 
+    /// <summary>
     /// True when the player is actually in the right view to use this. The HUD reads it.
+    /// </summary>
     public bool IsAvailable =>
         director != null && cameras != null &&
         director.IsInNpcView &&
         director.CanInteract &&
         cameras.Current == activeForCamera;
 
+    /// <summary>
     /// Text for the HUD hint, e.g. "[F] hide the steering wheel".
+    /// </summary>
     public string PromptLabel => obstructionsHidden ? hideLabel : showLabel;
 
     private void Awake()

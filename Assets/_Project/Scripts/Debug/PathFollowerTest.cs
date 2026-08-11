@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PathFollowerTest.cs
+ * DEBUG - throwaway actor used to test the scenario clock.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// A throwaway actor for Part 1, so you can prove the clock works before any real content
 /// exists. Put it on a Cube. It walks a ScenarioPath at a constant speed.
 ///
@@ -8,6 +18,7 @@ using UnityEngine;
 /// to ARRIVE at the ImpactMarker at exactly impactTime seconds.
 ///
 /// Delete this script once Part 2 is done.
+/// </summary>
 public class PathFollowerTest : ScenarioActor
 {
     [Header("Route")]
@@ -45,7 +56,9 @@ public class PathFollowerTest : ScenarioActor
         ApplyToTransform();
     }
 
+    /// <summary>
     /// Works out how far along the path this object must begin.
+    /// </summary>
     private float CalculateStartDistance()
     {
         if (path == null || !path.IsValid) return 0f;
@@ -78,7 +91,9 @@ public class PathFollowerTest : ScenarioActor
         return result;
     }
 
+    /// <summary>
     /// Ask the path where we are, and put the object there.
+    /// </summary>
     private void ApplyToTransform()
     {
         if (path == null || !path.IsValid) return;

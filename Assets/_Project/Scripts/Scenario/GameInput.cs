@@ -1,6 +1,16 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * GameInput.cs
+ * The single place player input is read from.
+ */
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
 /// The single place the game reads player input from.
 ///
 /// HOW IT RECEIVES INPUT
@@ -17,6 +27,7 @@ using UnityEngine.InputSystem;
 /// A "pressed this frame" bool has to be cleared by somebody, and if a consumer happens to
 /// run after the clear it misses the press. Recording WHICH frame the press happened on
 /// removes the clearing step entirely, so script execution order stops mattering.
+/// </summary>
 public class GameInput : MonoBehaviour
 {
     public static GameInput Instance { get; private set; }
@@ -30,28 +41,35 @@ public class GameInput : MonoBehaviour
 
     // ---------------------------------------------------------------- public API
 
+    /// <summary>
     /// Left mouse / E / gamepad A — examine, talk, change a hazard.
     ///
     /// Falls back to legacy input when this component isn't in the scene yet, so the game
     /// keeps working while you're partway through wiring it up.
+    /// </summary>
     public static bool InteractPressed =>
         Instance != null
             ? Instance.interactFrame == Time.frameCount
             : Input.GetMouseButtonDown(0);
 
+    /// <summary>
     /// Q / right mouse / gamepad B — leave a seat or a point of view.
+    /// </summary>
     public static bool BackPressed =>
         Instance != null
             ? Instance.backFrame == Time.frameCount
             : Input.GetKeyDown(KeyCode.Q) || Input.GetMouseButtonDown(1) ||
               Input.GetKeyDown(KeyCode.Escape);
 
+    /// <summary>
     /// Enter / gamepad Start — advance to the next part.
+    /// </summary>
     public static bool ContinuePressed =>
         Instance != null
             ? Instance.continueFrame == Time.frameCount
             : Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
 
+    /// <summary>
     /// Mouse movement since last frame.
     ///
     /// TWO THINGS THIS IS NOT:
@@ -67,19 +85,24 @@ public class GameInput : MonoBehaviour
     ///
     /// The fallback below reproduces both, so the feel is identical whether or not this
     /// component is in the scene.
+    /// </summary>
     public static Vector2 LookDelta =>
         Instance != null
             ? Instance.lookThisFrame
             : new Vector2(Input.GetAxis("Mouse X") * 0.5f, -Input.GetAxis("Mouse Y") * 0.5f);
 
+    /// <summary>
     /// F / gamepad Y — hide whatever is blocking the view. Only used in the driver's seat,
     /// where the steering wheel sits between the camera and the pedals.
+    /// </summary>
     public static bool ToggleViewPressed =>
         Instance != null
             ? Instance.toggleViewFrame == Time.frameCount
             : Input.GetKeyDown(KeyCode.F);
 
+    /// <summary>
     /// Where the mouse cursor is, for the ray used when the cursor is unlocked.
+    /// </summary>
     public static Vector2 PointerPosition =>
         Mouse.current != null ? Mouse.current.position.ReadValue() : (Vector2)Input.mousePosition;
 

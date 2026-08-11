@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PedestrianVictim.cs
+ * State machine for the student who is hit.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// FSM for the student who gets hit. ADAM OWNS THIS ONE.
 ///
 /// STATE DIAGRAM (draw this for the ReadMe):
@@ -18,6 +28,7 @@ using UnityEngine;
 ///   1. She reaches AtKerb based on DISTANCE, not a hard-coded time. Move the waypoints and
 ///      the logic still works.
 ///   2. The branch at AtKerb reads InterventionState. That single "if" is the game mechanic.
+/// </summary>
 public class PedestrianVictim : PathScenarioActor
 {
     public enum State
@@ -92,11 +103,15 @@ public class PedestrianVictim : PathScenarioActor
     // She only travels at one speed, so the back-solve is simple.
     protected override float PlannedSpeedToImpact => walkSpeed;
 
+    /// <summary>
     /// True only while she is actually exposed in the road. The ImpactDetector checks this
     /// so she can never be "hit" while standing safely on the pavement.
+    /// </summary>
     public bool IsVulnerable => state == State.Crossing;
 
+    /// <summary>
     /// Roughly chest height, which is what the car's bumper would strike.
+    /// </summary>
     public Vector3 ChestPoint => transform.position + Vector3.up * 1.0f;
 
     public State CurrentState => state;
@@ -181,21 +196,25 @@ public class PedestrianVictim : PathScenarioActor
         }
     }
 
+    /// <summary>
     /// Free Roam wants a witness standing up and able to talk. Every other phase is a
     /// playback, where she should go down on impact and stay there.
     ///
     /// MUST be called BEFORE the director seeks. The seek re-runs the whole incident inside
     /// one frame, so by the time it finishes the hit animation has already been triggered.
+    /// </summary>
     public void SetWitnessMode(bool witness)
     {
         witnessMode = witness;
     }
 
+    /// <summary>
     /// Moves her to the spot she should be standing on during the investigation.
     ///
     /// MUST be called AFTER the seek, because the seek puts her back wherever the collision
     /// left her. Safe to leave applying itself: the clock is paused in Free Roam, so Tick
     /// never runs and nothing moves her back.
+    /// </summary>
     public void ApplyWitnessPlacement()
     {
         if (!witnessMode || freeRoamStandPoint == null) return;
@@ -208,14 +227,18 @@ public class PedestrianVictim : PathScenarioActor
         UpdatePhonePose(force: true);
     }
 
+    /// <summary>
     /// Called by the ImpactDetector the moment the car reaches her.
+    /// </summary>
     public void NotifyStruck()
     {
         if (state == State.Struck || state == State.Aftermath) return;
         GoTo(State.Struck);
     }
 
+    /// <summary>
     /// Change state, reset the state timer, and run the "on entering" behaviour.
+    /// </summary>
     private void GoTo(State next)
     {
         state = next;
@@ -281,8 +304,10 @@ public class PedestrianVictim : PathScenarioActor
         }
     }
 
+    /// <summary>
     /// Points her POV camera down at the phone, or level once she's put it away.
     /// Only touches the camera when the state actually changes.
+    /// </summary>
     private void UpdatePovPitch(bool force = false)
     {
         if (povLook == null) return;
@@ -297,15 +322,19 @@ public class PedestrianVictim : PathScenarioActor
             phoneStowed ? povYawLookingUp   : povYawOnPhone);
     }
 
+    /// <summary>
     /// True in the states where she is actually moving along the path.
+    /// </summary>
     private bool IsWalking =>
         state == State.Walking || state == State.Distracted || state == State.Crossing;
 
+    /// <summary>
     /// Moves the phone between its walking pose and its standing pose.
     ///
     /// The texting animation and the idle animation hold her arm in completely different
     /// places, so one fixed offset can only ever look right in one of them. Only touches
     /// the transform when the pose actually changes.
+    /// </summary>
     private void UpdatePhonePose(bool force = false)
     {
         if (phoneObject == null) return;

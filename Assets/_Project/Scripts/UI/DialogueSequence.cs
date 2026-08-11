@@ -1,10 +1,21 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * DialogueSequence.cs
+ * A conversation, written on the character in the Inspector.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// A conversation, authored entirely in the Inspector. Put one on each person you can talk to.
 ///
 /// No dialogue graph, no branching, no node editor. A list of lines and one optional button
 /// at the end is all this game needs, and it takes thirty seconds to write a character's
 /// account rather than thirty minutes to wire a tree.
+/// </summary>
 public class DialogueSequence : MonoBehaviour
 {
     [SerializeField] private string speakerName = "Pedestrian";
@@ -43,7 +54,9 @@ public class DialogueSequence : MonoBehaviour
         return lines[index];
     }
 
+    /// <summary>
     /// Called by the dialogue panel's POV button.
+    /// </summary>
     public void PlayPovReplay()
     {
         if (Subject != null) Subject.PlayTheirReplay();

@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * InteractableEvidence.cs
+ * OLD PROTOTYPE - superseded by HazardInteractable. Kept for reference.
+ */
+
 using UnityEngine;
 
 public class InteractableEvidence : MonoBehaviour

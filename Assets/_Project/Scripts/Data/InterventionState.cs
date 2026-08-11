@@ -1,11 +1,22 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * InterventionState.cs
+ * Remembers which hazards the player has changed.
+ */
+
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
 /// Remembers which hazards the player has fixed. One of these lives on SYSTEMS.
 ///
 /// THE RULE THAT MATTERS: this is deliberately NOT cleared by ScenarioRunner.ResetScenario().
 /// If it were, the Resolve replay would undo everything the player just did. Only the Retry
 /// button clears it.
+/// </summary>
 public class InterventionState : MonoBehaviour
 {
     [Tooltip("The hazards that must ALL be fixed to avoid the collision.\n\n" +
@@ -26,7 +37,9 @@ public class InterventionState : MonoBehaviour
     // in there, which is exactly the "don't count the same fix twice" behaviour we want.
     private readonly HashSet<HazardId> applied = new HashSet<HazardId>();
 
+    /// <summary>
     /// How many of the REQUIRED hazards have been fixed. Red herrings don't count.
+    /// </summary>
     public int CorrectCount
     {
         get
@@ -40,27 +53,39 @@ public class InterventionState : MonoBehaviour
         }
     }
 
+    /// <summary>
     /// How many are needed in total. Used by the "2 / 4" HUD counter.
+    /// </summary>
     public int RequiredCount => requiredHazards.Count;
 
+    /// <summary>
     /// The required hazards, in Inspector order. The debrief walks this to build its
     /// report, so the order you type them in is the order they're explained.
+    /// </summary>
     public IReadOnlyList<HazardId> RequiredHazards => requiredHazards;
 
+    /// <summary>
     /// Everything the player changed, including things that made no difference.
+    /// </summary>
     public IEnumerable<HazardId> AllApplied => applied;
 
+    /// <summary>
     /// True only when EVERY required hazard is fixed. This is the single condition that
     /// decides whether the collision is avoided.
+    /// </summary>
     public bool AllRequiredFixed => CorrectCount >= requiredHazards.Count;
 
+    /// <summary>
     /// Has this particular hazard been fixed? Actors call this to decide what to show.
+    /// </summary>
     public bool Has(HazardId id) => applied.Contains(id);
 
     public bool IsRequired(HazardId id) => requiredHazards.Contains(id);
 
+    /// <summary>
     /// Fix a hazard. Returns TRUE only the first time, so the caller knows whether to
     /// play a sound / bump the score / fire an effect.
+    /// </summary>
     public bool Apply(HazardId id)
     {
         bool isNew = applied.Add(id);
@@ -68,15 +93,19 @@ public class InterventionState : MonoBehaviour
         return isNew;
     }
 
+    /// <summary>
     /// Wipes everything. Called by Retry, never by ResetScenario.
+    /// </summary>
     public void ClearAll()
     {
         applied.Clear();
         RefreshInspectorList();
     }
 
+    /// <summary>
     /// Copies the HashSet into a plain List purely so you can watch it in the Inspector.
     /// HashSets are invisible to Unity's Inspector; Lists are not.
+    /// </summary>
     private void RefreshInspectorList()
     {
         appliedForInspector.Clear();

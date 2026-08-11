@@ -1,7 +1,17 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * UIManager.cs
+ * Every panel and every piece of on-screen text.
+ */
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
 /// The single hub for every piece of on-screen text and every panel.
 ///
 /// Nothing else in the game touches a Text component. Scripts call methods here
@@ -11,6 +21,7 @@ using UnityEngine.UI;
 /// It is a singleton because there is exactly one of it and half the project needs to reach
 /// it. Singletons are frowned on in large codebases; in a four-week student project used for
 /// a handful of true globals they save real time.
+/// </summary>
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
@@ -58,6 +69,22 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button replayButton;
     [SerializeField] private Button continueButton;
 
+    [Header("Hazard found toast")]
+    /// <summary>Small celebratory line that pops up when a real hazard is fixed.</summary>
+    [SerializeField] private GameObject hazardFoundPanel;
+    [SerializeField] private TMP_Text hazardFoundText;
+
+    /// <summary>How long the toast stays on screen, in real seconds.</summary>
+    [SerializeField] private float hazardFoundDuration = 2.5f;
+
+    [Header("Confirm box")]
+    /// <summary>Yes/no panel used before committing to the intervention.</summary>
+    [SerializeField] private GameObject confirmPanel;
+    [SerializeField] private TMP_Text confirmTitle;
+    [SerializeField] private TMP_Text confirmBody;
+    [SerializeField] private Button confirmYesButton;
+    [SerializeField] private Button confirmNoButton;
+
     [Header("Debrief")]
     [SerializeField] private GameObject debriefPanel;
     [SerializeField] private TMP_Text debriefHeadline;
@@ -78,17 +105,28 @@ public class UIManager : MonoBehaviour
     private DialogueSequence activeDialogue;
     private int dialogueIndex;
 
+    // Seconds left before the hazard toast hides itself
+    private float hazardToastRemaining;
+
+    // What to run if the player says yes to the confirm box
+    private System.Action pendingConfirmAction;
+
+    /// <summary>
     /// True while a panel is up that the player must dismiss. Movement and the interaction
     /// ray are both suspended while this is true, so clicking "Next" cannot also re-trigger
     /// whatever is behind the panel.
+    /// </summary>
     public bool IsModalOpen { get; private set; }
 
+    /// <summary>
     /// Safe to call before Awake has run anywhere.
+    /// </summary>
     public static bool ModalOpen => Instance != null && Instance.IsModalOpen;
 
     // The frame a panel last closed on.
     private int modalClosedOnFrame = -1;
 
+    /// <summary>
     /// True while a panel is open AND for the rest of the frame it closes on.
     ///
     /// The extra frame matters. Script execution order between UIManager, the EventSystem
@@ -97,6 +135,7 @@ public class UIManager : MonoBehaviour
     ///   · pressing Q to close a dialogue also ejected you from the passenger seat
     ///   · clicking "Leave" also re-triggered the person behind the panel, reopening it
     /// Both bugs would appear or vanish depending on the order Unity happened to pick.
+    /// </summary>
     public static bool ModalBlockingInput =>
         Instance != null &&
         (Instance.IsModalOpen || Instance.modalClosedOnFrame == Time.frameCount);
@@ -115,6 +154,9 @@ public class UIManager : MonoBehaviour
 
         if (retryButton != null) retryButton.onClick.AddListener(() => director.RetryFromStart());
 
+        if (confirmYesButton != null) confirmYesButton.onClick.AddListener(AcceptConfirm);
+        if (confirmNoButton != null) confirmNoButton.onClick.AddListener(CancelConfirm);
+
         if (examineCloseButton != null) examineCloseButton.onClick.AddListener(CloseExamine);
         if (dialogueNextButton != null) dialogueNextButton.onClick.AddListener(AdvanceDialogue);
         if (dialoguePovButton != null) dialoguePovButton.onClick.AddListener(PlayDialoguePov);
@@ -126,18 +168,34 @@ public class UIManager : MonoBehaviour
         SetActive(dialoguePanel, false);
         SetActive(observePanel, false);
         SetActive(debriefPanel, false);
+        SetActive(confirmPanel, false);
+        SetActive(hazardFoundPanel, false);
     }
 
     private void Update()
     {
         RefreshHud();
+        UpdateHazardToast();
 
         // "Back" dismisses an open panel, so the player never has to hunt for the button
         if (IsModalOpen && GameInput.BackPressed)
         {
-            if (activeDialogue != null) CloseDialogue();
+            if (confirmPanel != null && confirmPanel.activeSelf) CancelConfirm();
+            else if (activeDialogue != null) CloseDialogue();
             else CloseExamine();
         }
+    }
+
+    /// <summary>Counts down the hazard toast and hides it when its time is up.</summary>
+    private void UpdateHazardToast()
+    {
+        if (hazardFoundPanel == null || !hazardFoundPanel.activeSelf) return;
+
+        // unscaledDeltaTime, so the toast lasts the same on screen no matter how slowly
+        // the incident happens to be running
+        hazardToastRemaining -= Time.unscaledDeltaTime;
+
+        if (hazardToastRemaining <= 0f) SetActive(hazardFoundPanel, false);
     }
 
     // ---------------------------------------------------------------- the HUD
@@ -239,7 +297,9 @@ public class UIManager : MonoBehaviour
 
     // ---------------------------------------------------------------- examine
 
+    /// <summary>
     /// Called when the player clicks a hazard during the investigation.
+    /// </summary>
     public void ShowExamine(string title, string body)
     {
         if (examinePanel == null) return;
@@ -257,7 +317,9 @@ public class UIManager : MonoBehaviour
         if (activeDialogue == null) CloseModal();
     }
 
+    /// <summary>
     /// Shown when the player changes something that was never going to help.
+    /// </summary>
     public void ShowNoEffect(string objectName)
     {
         ShowExamine("No effect",
@@ -323,10 +385,86 @@ public class UIManager : MonoBehaviour
         CloseModal();
     }
 
+    // ---------------------------------------------------------------- hazard toast
+
+    /// <summary>
+    /// Pops up a short line when the player fixes one of the four real hazards.
+    ///
+    /// Deliberately NOT a modal — it appears and fades on its own, because interrupting
+    /// the countdown to congratulate someone would be a strange reward.
+    /// </summary>
+    /// <param name="hazardName">The display name of the hazard, e.g. "her headphones".</param>
+    /// <param name="found">How many are fixed now.</param>
+    /// <param name="total">How many there are in total.</param>
+    public void ShowHazardFound(string hazardName, int found, int total)
+    {
+        if (hazardFoundPanel == null) return;
+
+        if (hazardFoundText != null)
+        {
+            hazardFoundText.text = found >= total
+                ? $"That's all {total}. Let's see what happens."
+                : $"Good catch — you dealt with {hazardName}.";
+        }
+
+        SetActive(hazardFoundPanel, true);
+        hazardToastRemaining = hazardFoundDuration;
+    }
+
+    // ---------------------------------------------------------------- confirm box
+
+    /// <summary>
+    /// Asks the player a yes/no question and runs onYes only if they agree.
+    ///
+    /// Used before the intervention, which is a one-way door — once the countdown starts
+    /// there is no going back to the investigation.
+    /// </summary>
+    /// <param name="title">Heading, e.g. "Begin the intervention?"</param>
+    /// <param name="body">A sentence or two explaining what is about to happen.</param>
+    /// <param name="onYes">What to run if they confirm.</param>
+    public void ShowConfirm(string title, string body, System.Action onYes)
+    {
+        if (confirmPanel == null)
+        {
+            // No panel wired up yet — just do the thing rather than blocking the player
+            onYes?.Invoke();
+            return;
+        }
+
+        pendingConfirmAction = onYes;
+
+        if (confirmTitle != null) confirmTitle.text = title;
+        if (confirmBody != null) confirmBody.text = body;
+
+        SetActive(confirmPanel, true);
+        OpenModal();
+    }
+
+    /// <summary>Runs the pending action and closes the box.</summary>
+    private void AcceptConfirm()
+    {
+        System.Action action = pendingConfirmAction;
+
+        // Clear and close BEFORE running it, because the action changes phase and would
+        // otherwise be fighting a panel that is still open.
+        CancelConfirm();
+        action?.Invoke();
+    }
+
+    /// <summary>Closes the box and forgets the pending action.</summary>
+    private void CancelConfirm()
+    {
+        pendingConfirmAction = null;
+        SetActive(confirmPanel, false);
+        CloseModal();
+    }
+
     // ---------------------------------------------------------------- debrief
 
+    /// <summary>
     /// Called by the director when the Debrief phase opens. Asks the ScoreManager to work
     /// out the result, then displays it.
+    /// </summary>
     public void ShowDebrief()
     {
         if (scoreManager == null)

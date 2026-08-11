@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * TrafficLightVisual.cs
+ * Switches the bulbs on one traffic light and toggles its stop line.
+ */
+
 using UnityEngine;
 
 public class TrafficLightVisual : MonoBehaviour

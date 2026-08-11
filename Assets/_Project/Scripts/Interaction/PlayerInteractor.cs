@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PlayerInteractor.cs
+ * The single raycast that drives every interaction in the game.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Casts one ray per frame and routes focus and click events to whatever IInteractable
 /// it hits. This is the ONLY raycasting script in the game.
 ///
@@ -7,6 +17,7 @@ using UnityEngine;
 /// with Cinemachine the real camera moves around independently of the player's body — into
 /// the passenger seat, into someone's eyes. Reading Camera.main means this keeps working in
 /// every one of those views with no extra code.
+/// </summary>
 public class PlayerInteractor : MonoBehaviour
 {
     [Header("What the ray can hit")]
@@ -24,7 +35,9 @@ public class PlayerInteractor : MonoBehaviour
     private IInteractable focused;
     private Camera cam;
 
+    /// <summary>
     /// What the player is looking at right now, or null. The HUD reads this.
+    /// </summary>
     public IInteractable Focused => focused;
 
     private void Awake()
@@ -95,8 +108,10 @@ public class PlayerInteractor : MonoBehaviour
         return candidate;
     }
 
+    /// <summary>
     /// Clears focus without firing anything. The director calls this on phase changes so a
     /// highlight can't be left stuck on when the camera cuts somewhere else.
+    /// </summary>
     public void ClearFocus()
     {
         focused?.OnFocusExit();

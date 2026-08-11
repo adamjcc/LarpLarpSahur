@@ -1,7 +1,18 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * HudPromptPlaceholder.cs
+ * DEBUG - temporary on-screen prompt, replaced by the Canvas.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// TEMPORARY crosshair and interaction prompt, drawn with OnGUI so it needs no setup.
 /// A proper Canvas replaces this in Part 5 alongside the dialogue panel. Delete it then.
+/// </summary>
 public class HudPromptPlaceholder : MonoBehaviour
 {
     [SerializeField] private PlayerInteractor interactor;

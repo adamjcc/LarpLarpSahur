@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * VehicleController.cs
+ * OLD PROTOTYPE - superseded by AmbientVehicle. Kept for reference.
+ */
+
 using UnityEngine;
 
 public class VehicleController : MonoBehaviour

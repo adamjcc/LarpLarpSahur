@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * IncidentVehicle.cs
+ * State machine for the speeding car involved in the collision.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// FSM for the speeding car. DARRYL OWNS THIS ONE.
 ///
 /// STATE DIAGRAM (draw this for the ReadMe):
@@ -11,7 +21,7 @@ using UnityEngine;
 ///                    ▼                                    ▼
 ///                 Braking ──> Stopped                  Unaware ──> Impact
 ///                    │                                              │
-///                    └──────────────> Aftermath <──────────────────┘
+///                    └──────────────&gt; Aftermath &lt;──────────────────┘
 ///
 /// THE SPEED TRICK, and it matters:
 /// PlannedSpeedToImpact returns the BRAKED speed when the player has applied that
@@ -19,6 +29,7 @@ using UnityEngine;
 /// a braked car simply starts closer and still arrives at the marker at exactly impactTime.
 /// So "slow the car down" changes how hard the crash is, never whether it happens.
 /// Only fixing all four hazards avoids it.
+/// </summary>
 public class IncidentVehicle : PathScenarioActor
 {
     public enum State
@@ -58,22 +69,37 @@ public class IncidentVehicle : PathScenarioActor
     [SerializeField] private float currentSpeed;
     [SerializeField] private float timeInState;
 
+    /// <summary>
     /// The speed the car will hold on the approach, given what the player has fixed.
+    /// </summary>
     private float TargetCruiseSpeed =>
         HasIntervention(HazardId.CarSpeed) ? brakedSpeed : normalSpeed;
 
     // The base class uses this to work out where the car must start.
     protected override float PlannedSpeedToImpact => TargetCruiseSpeed;
 
+    /// <summary>Finds the lights and damage swapper on the car if they weren't dragged in.</summary>
+    protected override void Awake()
+    {
+        base.Awake();
+
+        if (lights == null) lights = GetComponentInChildren<VehicleLights>();
+        if (damage == null) damage = GetComponentInChildren<DamageSwapper>();
+    }
+
+    /// <summary>
     /// Where the ImpactDetector measures the gap from. Falls back to the object's own
     /// position if you haven't made a bumper marker yet.
+    /// </summary>
     public Vector3 FrontPoint => frontBumper != null ? frontBumper.position : transform.position;
 
     public bool IsMoving => currentSpeed > 0.1f;
     public State CurrentState => state;
     public float CurrentSpeed => currentSpeed;
 
+    /// <summary>
     /// Speed in km/h, for the dashboard speedometer in Part 6.
+    /// </summary>
     public float SpeedKmh => currentSpeed * 3.6f;
 
     public override void Tick(float dt, float now)
@@ -147,7 +173,9 @@ public class IncidentVehicle : PathScenarioActor
         }
     }
 
+    /// <summary>
     /// Called by the ImpactDetector.
+    /// </summary>
     public void NotifyImpact()
     {
         if (state == State.Impact || state == State.Aftermath) return;

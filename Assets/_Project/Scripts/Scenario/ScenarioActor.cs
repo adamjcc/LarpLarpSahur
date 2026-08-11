@@ -1,6 +1,16 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * ScenarioActor.cs
+ * Base class for anything taking part in the replayable incident.
+ */
+
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
 /// Base class for anything that takes part in the replayable crash.
 ///
 /// "abstract" means you never put THIS on a GameObject. It is a template that other scripts
@@ -9,13 +19,23 @@ using UnityEngine;
 ///
 /// THE GOLDEN RULE: a ScenarioActor never moves itself in Update(). It only moves when the
 /// ScenarioRunner calls Tick(). That is the whole reason the crash is repeatable.
+/// </summary>
 public abstract class ScenarioActor : MonoBehaviour
 {
-    protected Vector3 startPosition;
-    protected Quaternion startRotation;
+    // Only ScenarioActor itself reads these, so they stay private.
+    // PathScenarioActor overrides ResetToStart completely and works out its own position.
+    private Vector3 startPosition;
+    private Quaternion startRotation;
+
+    /// <summary>
+    /// The Animator on this object or its model. Subclasses use it through the safe
+    /// SetAnim* helpers below rather than touching it directly.
+    /// </summary>
     protected Animator animator;
 
+    /// <summary>
     /// "virtual" means a child script can add to this. If it does, it must call base.Awake().
+    /// </summary>
     protected virtual void Awake()
     {
         // remember where the designer left this object, so ResetToStart can restore it
@@ -43,7 +63,9 @@ public abstract class ScenarioActor : MonoBehaviour
 
     private HashSet<string> animatorParameters;
 
+    /// <summary>
     /// Call this if you swap the Animator Controller at runtime.
+    /// </summary>
     public void RefreshAnimatorParameters()
     {
         animatorParameters = new HashSet<string>();
@@ -93,27 +115,35 @@ public abstract class ScenarioActor : MonoBehaviour
         ResetToStart();
     }
 
+    /// <summary>
     /// Controls the order actors are ticked within a single step. Lower goes first.
     ///
     /// This matters for the ImpactDetector: it has to run AFTER the car and the pedestrian
     /// have both moved this step, otherwise it measures the gap between them using
     /// last step's positions.
+    /// </summary>
     public virtual int TickOrder => 0;
 
+    /// <summary>
     /// Called once per fixed simulation step by the ScenarioRunner.
     /// dt  = always the same fixed amount (1/60 s). Never a variable frame time.
     /// now = seconds since the scenario started.
+    /// </summary>
     public abstract void Tick(float dt, float now);
 
+    /// <summary>
     /// Put me back exactly as I was at scenario time zero.
     /// Child scripts override this to also reset their state machine, distance, animator, etc.
+    /// </summary>
     public virtual void ResetToStart()
     {
         transform.SetPositionAndRotation(startPosition, startRotation);
     }
 
+    /// <summary>
     /// Slow motion for the things Unity animates by itself (Animators, NavMeshAgents),
     /// which the ScenarioRunner cannot reach directly.
+    /// </summary>
     public virtual void ApplyVisualTimeScale(float scale)
     {
         if (animator != null) animator.speed = scale;

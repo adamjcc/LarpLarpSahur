@@ -1,5 +1,15 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * ScenarioDebugKeys.cs
+ * DEBUG - keyboard shortcuts for driving the scenario clock.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Temporary keyboard controls + an on-screen readout, so you can drive the scenario clock
 /// by hand while building. Put this on the same object as the ScenarioRunner.
 ///
@@ -13,6 +23,7 @@ using UnityEngine;
 ///   4          seek to where Free Roam freezes (the aftermath)
 ///   [  and  ]  slow down / speed up the scenario
 ///   I          jump straight to the Intervene setup (rewind + slow motion + play)
+/// </summary>
 public class ScenarioDebugKeys : MonoBehaviour
 {
     [SerializeField] private ScenarioRunner runner;
@@ -86,7 +97,9 @@ public class ScenarioDebugKeys : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightBracket)) StepSpeed(+1);
     }
 
+    /// <summary>
     /// Jump to the next or previous speed preset.
+    /// </summary>
     private void StepSpeed(int direction)
     {
         // find whichever preset we're closest to right now

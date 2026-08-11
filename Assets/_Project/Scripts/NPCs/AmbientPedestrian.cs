@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * AmbientPedestrian.cs
+ * Background pedestrian that wanders using Unity NavMesh.
+ */
+
 using UnityEngine;
 using UnityEngine.AI;
 

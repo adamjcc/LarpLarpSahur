@@ -1,10 +1,21 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PathScenarioActor.cs
+ * Shared path-following behaviour for the two crash participants.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// Shared behaviour for the two crash participants: follow a path, and work out your own
 /// starting position so that you arrive at the ImpactMarker at exactly impactTime.
 ///
 /// PedestrianVictim and IncidentVehicle both inherit from this, so the awkward maths only
 /// exists once. They only have to supply their state machine and their speed.
+/// </summary>
 public abstract class PathScenarioActor : ScenarioActor
 {
     [Header("Route")]
@@ -16,42 +27,63 @@ public abstract class PathScenarioActor : ScenarioActor
     [Tooltip("Leave empty — it finds the one on SYSTEMS automatically.")]
     [SerializeField] protected InterventionState interventions;
 
-    [Header("Steering — leave both at 0 for instant snapping")]
-    [Tooltip("Metres to look ahead along the path when deciding which way to face.\n\n" +
-             "0 = face the current segment exactly, which makes a vehicle pivot on the spot " +
-             "at a corner. Try 4 on the car so it starts turning INTO the bend.\n" +
-             "Leave at 0 for people — they walk in straight lines.")]
+    [Header("Steering — leave both at 0 to face the path exactly")]
+    /// <summary>
+    /// How far up the path to look when deciding which way to face, in metres.
+    /// 0 makes the object face its current segment exactly, which is right for people.
+    /// A small value on a vehicle makes it start turning slightly before the bend.
+    /// </summary>
+    [Tooltip("Metres to look ahead when deciding which way to face.\n\n" +
+             "0 = face the current segment exactly (correct for people).\n" +
+             "2 on the car, so it leans into the bend slightly early.")]
     [SerializeField] private float lookAheadDistance = 0f;
 
-    [Tooltip("Degrees per second the object may rotate. 0 = snap instantly.\n" +
-             "Try 90 on the car. Purely cosmetic — it never affects position, so the " +
-             "collision timing is untouched.")]
-    [SerializeField] private float maxTurnRate = 0f;
+    /// <summary>
+    /// How quickly the object turns toward the direction it should be facing.
+    /// Higher is snappier, lower is lazier. 0 snaps instantly with no smoothing.
+    /// </summary>
+    [Tooltip("Turn responsiveness. Higher = snappier. 0 = snap instantly.\n\n" +
+             "Try 6 on the car. This eases in AND out, so the turn starts and finishes " +
+             "gently instead of rotating at one flat rate.\n\n" +
+             "Purely cosmetic — it never touches position, so the collision timing is safe " +
+             "to leave alone while you tune it.")]
+    [SerializeField] private float turnSmoothing = 0f;
 
     [Header("Read-only (fills in while playing)")]
-    [SerializeField] protected float distanceTravelled;
-    [SerializeField] protected float startDistance;
-    [SerializeField] protected float impactDistanceOnPath;
+    // Private, not protected: only this class reads them. They still show in the Inspector
+    // because [SerializeField] does that regardless of access level, which is handy for
+    // watching the numbers while the incident plays.
+    [SerializeField] private float distanceTravelled;
+    [SerializeField] private float startDistance;
+    [SerializeField] private float impactDistanceOnPath;
 
+    /// <summary>
     /// The speed this actor expects to travel at between t=0 and impact.
     ///
     /// The vehicle overrides this to return its BRAKED speed when the player has applied
     /// the brake intervention. That is what keeps the arrival time locked: a slower car
     /// simply starts closer, so it still reaches the marker at impactTime. Braking changes
     /// how hard the crash is, never when it happens.
+    /// </summary>
     protected abstract float PlannedSpeedToImpact { get; }
 
+    /// <summary>
     /// Metres still to travel before reaching the impact point. Goes negative once past it.
     /// State machines use this instead of hard-coded times, so the logic survives you
     /// moving waypoints around.
+    /// </summary>
     public float DistanceToImpact => impactDistanceOnPath - distanceTravelled;
 
+    /// <summary>
     /// True when everything this actor needs has actually been assigned. Every Tick starts
     /// by checking this, so a forgotten drag gives you one clear error in Awake instead of
     /// a NullReferenceException sixty times a second.
+    /// </summary>
     protected bool IsConfigured => path != null && path.IsValid && settings != null;
 
+    /// <summary>
     /// Null-safe shortcuts, so the state machines stay readable.
+    /// </summary>
     protected bool HasIntervention(HazardId id) => interventions != null && interventions.Has(id);
     protected bool AllHazardsFixed => interventions != null && interventions.AllRequiredFixed;
 
@@ -79,7 +111,9 @@ public abstract class PathScenarioActor : ScenarioActor
         ApplyToTransform(0f, snapRotation: true);
     }
 
+    /// <summary>
     /// Move forward along the path by speed x dt, then place the object there.
+    /// </summary>
     protected void MoveAlongPath(float speed, float dt)
     {
         distanceTravelled += speed * dt;
@@ -90,7 +124,9 @@ public abstract class PathScenarioActor : ScenarioActor
         SetAnimFloat("Speed", speed);
     }
 
+    /// <summary>
     /// Ask the path where we are now and put the transform there.
+    /// </summary>
     protected void ApplyToTransform(float dt, bool snapRotation)
     {
         if (path == null || !path.IsValid) return;
@@ -112,22 +148,27 @@ public abstract class PathScenarioActor : ScenarioActor
 
         Quaternion target = Quaternion.LookRotation(forward);
 
-        if (snapRotation || maxTurnRate <= 0f)
+        if (snapRotation || turnSmoothing <= 0f)
         {
             transform.rotation = target;
         }
         else
         {
-            // dt is the fixed simulation step, so this stays perfectly repeatable
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation, target, maxTurnRate * dt);
+            // Exponential smoothing rather than a constant turn rate. A constant rate
+            // rotates at one flat speed and stops dead, which is what made the corner look
+            // mechanical. This eases in and out, so the turn begins gently and settles
+            // gently. dt is the fixed simulation step, so it stays perfectly repeatable.
+            float blend = 1f - Mathf.Exp(-turnSmoothing * dt);
+            transform.rotation = Quaternion.Slerp(transform.rotation, target, blend);
         }
     }
 
+    /// <summary>
     /// THE AUTO-POSITIONING. Works out how far along the path this actor must begin,
     /// so it lands on the marker at exactly impactTime.
     ///
     ///     start  =  (distance along path to the marker)  -  (speed x impactTime)
+    /// </summary>
     private void RecalculateStartDistance()
     {
         if (path == null || !path.IsValid || settings == null || settings.impactMarker == null)

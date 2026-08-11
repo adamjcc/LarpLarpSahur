@@ -1,10 +1,21 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * ScenarioSettings.cs
+ * Shared timing and geometry numbers for the whole incident.
+ */
+
 using UnityEngine;
 
+/// <summary>
 /// One place for every number that more than one script needs to agree on.
 ///
 /// Without this you end up typing "7" into the pedestrian, the car, the director and the HUD,
 /// then changing three of them and spending an evening on why the crash drifted. Put this on
 /// SYSTEMS and everything reads from it.
+/// </summary>
 public class ScenarioSettings : MonoBehaviour
 {
     [Header("The key moment")]
@@ -48,19 +59,29 @@ public class ScenarioSettings : MonoBehaviour
 
     // ---- Handy computed values, so nobody does this arithmetic by hand ----
 
+    /// <summary>
     /// The clock value Free Roam freezes at.
+    /// </summary>
     public float FreeRoamTime => impactTime + aftermathViewOffset;
 
+    /// <summary>
     /// The clock value Intervene rewinds to.
+    /// </summary>
     public float InterveneStartTime => Mathf.Max(0f, impactTime - interveneLeadTime);
 
+    /// <summary>
     /// The clock value a POV replay starts from.
+    /// </summary>
     public float PovReplayStartTime => Mathf.Max(0f, impactTime - povReplayLeadTime);
 
+    /// <summary>
     /// The clock value a POV replay stops at.
+    /// </summary>
     public float PovReplayEndTime => impactTime + povReplayTailTime;
 
+    /// <summary>
     /// How many REAL seconds the player actually gets during Intervene.
+    /// </summary>
     public float InterveneRealSeconds => interveneLeadTime / Mathf.Max(0.001f, interveneTimeScale);
 
     // OnValidate runs whenever you change a value in the Inspector. This just keeps the

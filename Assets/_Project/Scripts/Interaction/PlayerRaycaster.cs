@@ -1,3 +1,12 @@
+/*
+ * Larp Larp Sahur Studios
+ * Adam Jamal Clark, Pinili Kian Marcus Valdez, Darryl Yap, Isaiah Tsai
+ * Y2S1 IP - Integrated Project
+ *
+ * PlayerRaycaster.cs
+ * OLD PROTOTYPE - superseded by PlayerInteractor. Kept for reference.
+ */
+
 using UnityEngine;
 
 public class PlayerRaycaster : MonoBehaviour
