@@ -31,6 +31,14 @@ public class DamageSwapper : MonoBehaviour
     [Tooltip("Drag in the wrecked bodywork, e.g. _CARDAMAGED. Hidden until the car is hit.")]
     [SerializeField] private GameObject[] damagedObjects;
 
+    [Header("Impact effects")]
+    /// <summary>
+    /// Particle systems that fire on impact — sparks off the tyre, glass, dust.
+    /// Played on the collision and cleared on every reset, so a prevented crash shows nothing.
+    /// </summary>
+    [Tooltip("Drag in CarParticles or any other impact effect.")]
+    [SerializeField] private ParticleSystem[] impactParticles;
+
     [Header("Optional loose parts")]
     /// <summary>
     /// Small parts thrown loose on impact. These need a Rigidbody, and they are the game's
@@ -87,6 +95,7 @@ public class DamageSwapper : MonoBehaviour
 
         SetActiveAll(intactObjects, !damaged);
         SetActiveAll(damagedObjects, damaged);
+        SetParticles(damaged);
 
         for (int i = 0; i < debris.Length; i++)
         {
@@ -95,6 +104,34 @@ public class DamageSwapper : MonoBehaviour
 
             if (damaged) ThrowDebris(rb);
             else RestoreDebris(rb, i);
+        }
+    }
+
+    /// <summary>
+    /// Fires the impact effects, or clears them completely.
+    ///
+    /// Stop with StopEmittingAndClear rather than plain Stop, so that resetting the
+    /// scenario wipes the particles already in the air instead of leaving sparks hanging
+    /// over an undamaged car.
+    /// </summary>
+    private void SetParticles(bool play)
+    {
+        if (impactParticles == null) return;
+
+        foreach (ParticleSystem ps in impactParticles)
+        {
+            if (ps == null) continue;
+
+            if (play)
+            {
+                ps.gameObject.SetActive(true);
+                ps.Clear(true);
+                ps.Play(true);
+            }
+            else
+            {
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
         }
     }
 

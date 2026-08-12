@@ -1,0 +1,163 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5274343262012682633
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4790119077816167219}
+  - component: {fileID: 8491027445162632342}
+  - component: {fileID: 5923015472090058844}
+  - component: {fileID: 2355271637588686410}
+  - component: {fileID: 1191970864977149768}
+  - component: {fileID: 7581983601041195617}
+  m_Layer: 11
+  m_Name: SoftDrink1_DarkRed
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4790119077816167219
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5274343262012682633}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.50530547, y: 0.5102998, z: -0.49448773, w: 0.48963493}
+  m_LocalPosition: {x: -0, y: 0.08, z: 0.049}
+  m_LocalScale: {x: 0.053785805, y: 0.05378577, z: 0.053785786}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0.564, y: 91.804, z: -89.983}
+--- !u!33 &8491027445162632342
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5274343262012682633}
+  m_Mesh: {fileID: -7387706064836869012, guid: 02a82b9b4bbb8874d9688054552b6dfb, type: 3}
+--- !u!23 &5923015472090058844
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5274343262012682633}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 73f3c7522905b0d48b18dfd2ec9b42fe, type: 2}
+  - {fileID: 2100000, guid: 81ed9aee4554fc249a441f1604d5c1a7, type: 2}
+  - {fileID: 2100000, guid: 2c21d001034dc6e4a8e99bb0345a6be8, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &2355271637588686410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5274343262012682633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0604a090429b365479fb2a3064aedd3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Highlighter
+  highlightTint: {r: 1, g: 0.85, b: 0.3, a: 1}
+  tintAmount: 0.45
+  emissionStrength: 0.8
+  renderersOverride:
+  - {fileID: 5923015472090058844}
+--- !u!114 &1191970864977149768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5274343262012682633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 402b127f8679d41458db41b3601b2d75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HazardInteractable
+  hazardId: 5
+  displayName: the soda can
+  isRedHerring: 1
+  access: 1
+  maxDistance: 3.5
+  examineDescription: Delicious fizzing soda in the pedestrian's hand. Feels almost
+    empty, soon to be thrown away.
+  debriefExplanation: 
+  onApplied:
+    m_PersistentCalls:
+      m_Calls: []
+  hideWhenApplied: {fileID: 0}
+  highlighter: {fileID: 0}
+  director: {fileID: 0}
+  interventions: {fileID: 0}
+  ledger: {fileID: 0}
+--- !u!65 &7581983601041195617
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5274343262012682633}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.6001587, y: 2.8023334, z: 3.9725997}
+  m_Center: {x: -0.0012036079, y: 0.017171733, z: 0.08042681}

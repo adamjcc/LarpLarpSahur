@@ -80,6 +80,38 @@ public class UIManager : MonoBehaviour
     /// </summary>
     [SerializeField] private Image countdownBar;
 
+    /// <summary>
+    /// One row of the hazard tracker: the four slots that fill in as the player works.
+    ///
+    /// Each slot has two backgrounds and two icons, and we swap between them rather than
+    /// changing a sprite, so the "found" versions can be a different size or colour with no
+    /// extra code.
+    /// </summary>
+    [System.Serializable]
+    public class HazardIndicator
+    {
+        [Tooltip("Which hazard this slot represents. Pick from the dropdown.")]
+        public HazardId hazard;
+
+        [Tooltip("HazardItemN_Inner — the empty background. Shown until it is found.")]
+        public GameObject innerDefault;
+
+        [Tooltip("HazardItemN_Inner_ITEMGOT — the filled background. Shown once found.")]
+        public GameObject innerFound;
+
+        [Tooltip("IconN_NOTFOUND — the greyed icon.")]
+        public GameObject iconNotFound;
+
+        [Tooltip("IconN_FOUND — the lit icon.")]
+        public GameObject iconFound;
+    }
+
+    [Header("Hazard tracker")]
+    /// <summary>
+    /// The four hazard slots. Set each row's Hazard dropdown to match the icon you dragged in.
+    /// </summary>
+    [SerializeField] private HazardIndicator[] hazardIndicators;
+
     [Header("Countdown pulse")]
     /// <summary>How long each kick lasts, in real seconds.</summary>
     [SerializeField] private float pulseDuration = 0.25f;
@@ -249,6 +281,32 @@ public class UIManager : MonoBehaviour
         SetActive(confirmPanel, false);
         SetActive(hazardFoundPanel, false);
         SetActive(howToPlayPanel, false);
+
+        WarnAboutUnassignedButtons();
+    }
+
+    /// <summary>
+    /// Says which buttons have not been dragged into their slot.
+    ///
+    /// A button with an empty slot is completely silent when clicked, which looks exactly
+    /// like a broken script. One warning at startup saves a lot of hunting.
+    /// </summary>
+    private void WarnAboutUnassignedButtons()
+    {
+        WarnIfMissing(startButton, "Start Button");
+        WarnIfMissing(quitButton, "Quit Button");
+        WarnIfMissing(backToMenuButton, "Back To Menu Button");
+        WarnIfMissing(retryButton, "Retry Button");
+        WarnIfMissing(mainMenuPanel, "Main Menu Panel");
+    }
+
+    private void WarnIfMissing(Object slot, string slotName)
+    {
+        if (slot == null)
+        {
+            Debug.LogWarning($"[UIManager] '{slotName}' is empty, so that button will do " +
+                             "nothing when clicked. Drag it in on the Canvas.", this);
+        }
     }
 
     private void Update()
@@ -294,6 +352,8 @@ public class UIManager : MonoBehaviour
         if (inMenu)
         {
             SetActive(crosshair, false);
+            SetActive(crosshairDefault, false);
+            SetActive(crosshairSelected, false);
             SetActive(phaseBanner, false);
             SetActive(interveneGroup, false);
             SetActive(observePanel, false);
@@ -392,12 +452,38 @@ public class UIManager : MonoBehaviour
             }
 
             if (hazardLabel != null) hazardLabel.text = "HAZARDS FOUND";
+
+            UpdateHazardIndicators();
         }
         else
         {
             // Leave the number sitting straight when the countdown isn't running,
             // otherwise it can be frozen mid-tilt the next time it appears.
             ResetCountdownPulse();
+        }
+    }
+
+    /// <summary>
+    /// Fills in each hazard slot as the player deals with it.
+    ///
+    /// For every slot: the empty background is swapped for the filled one, and the greyed
+    /// icon for the lit one. Nothing is hardcoded to a slot number — each row carries its
+    /// own Hazard dropdown, so reordering the icons in the Inspector cannot break it.
+    /// </summary>
+    private void UpdateHazardIndicators()
+    {
+        if (hazardIndicators == null || interventions == null) return;
+
+        foreach (HazardIndicator slot in hazardIndicators)
+        {
+            if (slot == null) continue;
+
+            bool found = interventions.Has(slot.hazard);
+
+            SetActive(slot.innerDefault, !found);
+            SetActive(slot.innerFound, found);
+            SetActive(slot.iconNotFound, !found);
+            SetActive(slot.iconFound, found);
         }
     }
 

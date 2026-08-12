@@ -121,6 +121,36 @@ def keycap(draw: ImageDraw.ImageDraw, x: int, y: int, text: str, width: int) -> 
     centred_text(draw, x, y - 1, text, caveat(20), WHITE)
 
 
+def draw_control_card(
+    draw: ImageDraw.ImageDraw,
+    centre_x: int,
+    centre_y: int,
+    key: str,
+    label: str,
+    key_width: int,
+    accent: tuple[int, int, int, int],
+) -> None:
+    """Draw one evenly aligned control hint inside the controls panel."""
+    left = centre_x - 120
+    top = centre_y - 42
+    right = centre_x + 120
+    bottom = centre_y + 42
+    draw.rounded_rectangle(
+        (left * SCALE, top * SCALE, right * SCALE, bottom * SCALE),
+        radius=18 * SCALE,
+        fill=(255, 255, 255, 205),
+        outline=(16, 24, 32, 80),
+        width=3 * SCALE,
+    )
+    draw.rounded_rectangle(
+        (left * SCALE, top * SCALE, (left + 10) * SCALE, bottom * SCALE),
+        radius=5 * SCALE,
+        fill=accent,
+    )
+    keycap(draw, centre_x - 50, centre_y, key, key_width)
+    centred_text(draw, centre_x + 59, centre_y, label, annie(21), NAVY)
+
+
 def compose() -> Image.Image:
     source = Image.open(SOURCE_PATH).convert("RGBA")
     card = source.resize((3600, 2100), Image.Resampling.LANCZOS)
@@ -128,10 +158,20 @@ def compose() -> Image.Image:
     canvas.alpha_composite(card, (120, 30))
     draw = ImageDraw.Draw(canvas)
 
-    # The generated card's four boxes mapped onto the final 1920 x 1080 design grid.
-    centres = ((300, 560), (710, 610), (1125, 560), (1575, 610))
-    icon_centres = ((300, 475), (710, 490), (1125, 440), (1575, 505))
+    # Actual visual bounds of the four hand-drawn boxes on the 1920 x 1080 grid.
+    # Each overlay element is derived from these bounds so every step stays aligned.
+    box_bounds = (
+        (150, 398, 505, 710),
+        (625, 480, 970, 760),
+        (1093, 443, 1425, 730),
+        (1538, 491, 1857, 796),
+    )
     step_colours = (GREEN, AMBER, RED, GREEN)
+    # Compensate for handles/arrows that make some icons visually right-heavy.
+    icon_x_offsets = (0, -12, -30, -34)
+    icon_y_offsets = (0, -18, 0, 0)
+    heading_sizes = (40, 32, 38, 38)
+    body_sizes = (20, 18, 18, 18)
 
     centred_text(draw, 960, 155, "How to Play", caveat(92), GREEN, stroke_width=5, stroke_fill=WHITE)
     centred_text(draw, 960, 225, "See the risk. Change the outcome.", annie(36), NAVY)
@@ -144,29 +184,48 @@ def compose() -> Image.Image:
     )
     icon_drawers = (draw_eye, draw_magnifier, draw_wrench_clock, draw_replay_report)
 
-    for index, ((number, heading, body), centre, icon_centre, colour, icon_drawer) in enumerate(
-        zip(step_data, centres, icon_centres, step_colours, icon_drawers, strict=True)
+    for (number, heading, body), bounds, colour, icon_x_offset, icon_y_offset, heading_size, body_size, icon_drawer in zip(
+        step_data,
+        box_bounds,
+        step_colours,
+        icon_x_offsets,
+        icon_y_offsets,
+        heading_sizes,
+        body_sizes,
+        icon_drawers,
+        strict=True,
     ):
-        icon_drawer(draw, icon_centre)
-        draw_step_number(draw, (centre[0] - 120, centre[1] - 8), number, colour)
-        centred_text(draw, centre[0] + 30, centre[1] - 18, heading, caveat(43), NAVY)
-        centred_text(draw, centre[0], centre[1] + 56, body, annie(25), NAVY)
+        left, top, right, bottom = bounds
+        centre_x = (left + right) // 2
+        box_height = bottom - top
+        icon_centre = (centre_x + icon_x_offset, top + 86 + icon_y_offset)
+        heading_y = top + 168
+        body_y = top + min(210, box_height - 68)
 
-    # Compact controls strip beneath the map. It sits on the paper itself.
-    strip = (285 * SCALE, 835 * SCALE, 1635 * SCALE, 985 * SCALE)
-    draw.rounded_rectangle(strip, radius=44 * SCALE, fill=(247, 244, 232, 235), outline=NAVY, width=7 * SCALE)
-    centred_text(draw, 960, 865, "Controls", caveat(38), GREEN)
+        icon_drawer(draw, icon_centre)
+        # Number badges sit on, and slightly overlap, the top edge of every box.
+        draw_step_number(draw, (left + 46, top + 5), number, colour)
+        centred_text(draw, centre_x, heading_y, heading, caveat(heading_size), NAVY)
+        centred_text(draw, centre_x, body_y, body, annie(body_size), NAVY)
+
+    # A single tidy controls panel with a title tab and five matching control cards.
+    strip = (270 * SCALE, 842 * SCALE, 1650 * SCALE, 1008 * SCALE)
+    draw.rounded_rectangle(strip, radius=42 * SCALE, fill=(247, 244, 232, 245), outline=WHITE, width=13 * SCALE)
+    draw.rounded_rectangle(strip, radius=42 * SCALE, outline=NAVY, width=7 * SCALE)
+    title_tab = (830 * SCALE, 820 * SCALE, 1090 * SCALE, 874 * SCALE)
+    draw.rounded_rectangle(title_tab, radius=27 * SCALE, fill=GREEN, outline=WHITE, width=5 * SCALE)
+    draw.rounded_rectangle(title_tab, radius=27 * SCALE, outline=NAVY, width=3 * SCALE)
+    centred_text(draw, 960, 847, "Controls", caveat(32), WHITE)
 
     control_items = (
-        (395, "WASD", 130, "Move"),
-        (645, "MOUSE", 150, "Look"),
-        (910, "E / CLICK", 180, "Interact"),
-        (1195, "Q / RMB", 175, "Leave view"),
-        (1490, "ENTER", 145, "Continue"),
+        (410, "WASD", 104, "Move", GREEN),
+        (685, "MOUSE", 112, "Look", AMBER),
+        (960, "E / CLICK", 132, "Interact", RED),
+        (1235, "Q / RMB", 126, "Leave view", AMBER),
+        (1510, "ENTER", 106, "Continue", GREEN),
     )
-    for x, key, width, label in control_items:
-        keycap(draw, x, 920, key, width)
-        centred_text(draw, x, 965, label, annie(22), NAVY)
+    for x, key, width, label, accent in control_items:
+        draw_control_card(draw, x, 938, key, label, width, accent)
 
     return canvas
 

@@ -60,11 +60,41 @@ public class RagdollController : MonoBehaviour
         if (characterAnimator == null) characterAnimator = GetComponentInChildren<Animator>();
         if (skeletonRoot == null && characterAnimator != null) skeletonRoot = characterAnimator.transform;
 
-        bones = GetComponentsInChildren<Rigidbody>();
-        boneColliders = GetComponentsInChildren<Collider>();
-
+        CollectRagdollParts();
         CacheRestingPose();
         SetRagdollActive(false);
+    }
+
+    /// <summary>
+    /// Finds only the bits the Ragdoll Wizard created, and nothing else.
+    ///
+    /// THIS IS THE IMPORTANT BIT. A naive GetComponentsInChildren&lt;Collider&gt;() also picks up
+    /// every interaction trigger on the character — her body volume, her headphones, her
+    /// phone — and switching those off makes her completely unclickable. So we start from
+    /// the Rigidbodies the wizard added and take only the collider sitting on each of those
+    /// same objects, skipping triggers entirely.
+    /// </summary>
+    private void CollectRagdollParts()
+    {
+        Transform searchRoot = skeletonRoot != null ? skeletonRoot : transform;
+
+        bones = searchRoot.GetComponentsInChildren<Rigidbody>();
+
+        var found = new System.Collections.Generic.List<Collider>();
+
+        foreach (Rigidbody bone in bones)
+        {
+            if (bone == null) continue;
+
+            // Only colliders on the same GameObject as a ragdoll bone
+            foreach (Collider c in bone.GetComponents<Collider>())
+            {
+                // Triggers are interaction volumes, never ragdoll parts
+                if (c != null && !c.isTrigger && c != mainCollider) found.Add(c);
+            }
+        }
+
+        boneColliders = found.ToArray();
     }
 
     /// <summary>
@@ -111,9 +141,11 @@ public class RagdollController : MonoBehaviour
             }
         }
 
+        // Only the wizard's own colliders, collected in CollectRagdollParts. Interaction
+        // triggers are never in this list, so she stays clickable throughout.
         foreach (Collider c in boneColliders)
         {
-            if (c != null && c != mainCollider) c.enabled = active;
+            if (c != null) c.enabled = active;
         }
 
         // Put every bone back before the Animator takes over again
