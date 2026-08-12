@@ -3,6 +3,13 @@
 **This is the authoritative plan.** `UNITY_ARCHITECTURE_PLAN.md` is kept for its background
 explanations, but where the two disagree, *this* document wins.
 
+> **New:** `PROJECT_CONTEXT.md` holds the settled decisions, conventions and the list of traps
+> that have already cost us time. Read that first if you are picking the project up cold.
+>
+> **Scripts moved to `Assets/Scripts/` on 11 Aug** (out of `_Project/`). All GUIDs verified
+> intact, no scene references broken. Paths in older sections of this document that say
+> `_Project/Scripts/...` mean `Assets/Scripts/...`.
+
 Written 30 July 2026 · Unity 6000.3.13f1 · URP 17.3 · Cinemachine 3.1.2
 
 ---
@@ -892,7 +899,26 @@ Moving the camera back would have fixed the raycast and ruined the framing. This
 and reads as a deliberate feature: an analyst stripping away the parts of a reconstruction
 that are in the way.
 
-## Part 12 — UI polish
+## Part 12 — UI polish  *(IN PROGRESS)*
+
+### Already built
+
+- **Phase banner stays up inside the car and inside a POV.** It is hidden completely during
+  a POV *replay* so nothing sits over the shot, and during the debrief because that panel
+  carries its own headline.
+- **The hint and the controls are two separate lines.** `PhaseHint` says what this part of
+  the game *is*; `controlsHint` lists which keys currently do something, including `[F]` only
+  when the steering wheel is genuinely in the way. Splitting them stops the hint turning into
+  a wall of bracketed keys.
+- **Traffic lights on the banner.** Green while the incident is playing back, yellow while
+  investigating, red while the countdown runs, all off during a POV replay. Only the `_ON`
+  objects are touched; the `_OFF` bulbs sit underneath permanently.
+- **The countdown kicks on every whole second** — a quick scale-up and a small tilt that
+  alternates direction so it rocks rather than flicking the same way each time. Tunable via
+  `pulseDuration`, `pulseScale` and `pulseTilt`.
+- **Hazard counter split** into numbers (`2/4`) and label (`HAZARDS FOUND`).
+
+### Still to do
 
 **Delivers:** a TMP font asset, a colour palette, panel artwork, and fade transitions.
 

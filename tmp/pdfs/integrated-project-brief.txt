@@ -1,0 +1,719 @@
+Official Open  
+ 
+ 
+Studio 2 (Integrated Studio Project) 
+Diploma in Immersive Media Year 
+2 (2026/2027) Semester 2.1 DUX, 
+I3E, 3RT, STLD 
+ 
+Version 1 
+ 
+Week 
+14- 17 
+Integrated Project (DUX, I3E, 3RT, STLD) (30%) 
+Delta Challenge 2026: Guardians of Tomorrow 
+ 
+ 
+OVERVIEW 
+Two themes; choose one to do: 
+ 
+THEMATIC CHOICE 1 
+ 
+ 
+Delta Challenge 2026 Track B: Guardians of Tomorrow Problem Statements: 
+General Delta Challenge2026 :is organised by National Crime Prevention Council and the Singapore 
+Police Force. The Track B of the Delta Challenge has following 3 problem statements: 
+1. Crime prevention,     
+How to stop crimes from happening before they occur. It involves educating the public, 
+strengthening security measures, building community partnerships, and encouraging vigilance 
+among residents and businesses. 
+2. Scam education,     
+What novel and effective solutions can be implemented to prevent youths from falling prey to 
+online scams? Propose a project to protect youths against scams. 
+3. Road safety education.  
+How can we create an engaging and interactive road safety education programme that 
+resonates with today's youth? 
+ 
+Requirement: To conceptualize, propose, create and develop a whole 3D Virtual Experience 
+based off 1 out of 3  of Delta Challenge 2026 Track B: Guardians of Tomorrow Problem Statements. 
+Project submissions close on 31 August 2026. 
+• The team choose to do Delta challenge, and submit (show evidence to tutor) on week 17 will get 
+3 extra marks across all 4 modules. 
+ 
+GeneralThe Delta Challenge 2026 Launchpad is open for registration now , The Launchpad held on 1 
+August 2026 (Saturday),  
+  
+• Registration for the Launchpad closes on 26 July 2026. Spots are limited, so early registration 
+is encouraged. Register at: Delta Challenge 2026: Join the Launchpad!.  Further details on 
+challenge registration and project submission will be shared with participants after the 
+Launchpad session. 
+ 
+
+=== PAGE BREAK ===
+
+Official Open  
+ 
+ 
+THEMATIC CHOICE 2 
+ 
+Your Own BIG IDEA 
+Requirement:  Within your team, conceptualize, prototype and develop your case scenario with 
+the following requirements. Ensure that the theme and idea proposed, satisfies all the requirements 
+of the modules involved (DUX, 3RT, STLD, I3E) 
+ 
+Priority: Consult your STLD and I3E tutors on idea feasibility 
+ 
+GUIDELINES 
+ 
+The Big Idea … THE EXPERIENCE. 
+Your integrated project will be assessed based on the following criteria: 
+1. Originality and thoroughness in explanation of concept 
+2. Interpretation and manifestation of the theme 
+3. Rationale behind design and concept 
+4. Thorough considerations to wholesome user interaction 
+5. Is the main idea okay-ed with the tutors? 
+ 
+You may want to ask yourself the following questions as you go along: 
+● How to conceptualize and design the best user experience? 
+
+
+=== PAGE BREAK ===
+
+Official Open  
+● Does it fulfil its role in serving its target audience effectively? Would the users be able to 
+achieve the desired goals? Entertainment? Education? Edutainment? Business Driven? 
+Fan Driven? Data Driven? Casual? What would your world be like? 
+● How can I propose something creative but intuitive? 
+● How can your proposed web app enhance the whole experience as compared to the norm? 
+● Did I do adequate research on: 
+○ How can my concept be executed? 
+Hardware requirements (if any)? 
+ 
+ 
+Goal: To utilize Unity to create a 3D Virtual Scenario that encourages real-time interactivity with a 
+great user experience tied to a given theme (Delta Challenge 2026 or Your Own BIG IDEA). 
+ 
+LEARNING OBJECTIVE 
+● Engage in Collaborative experience within a team environment 
+● Conceptualize a creative experience for 3D 
+● Build critical project leadership and team building skills 
+● Apply UX frameworks / principles / processes to a project 
+● Develop strong understanding of 3D world creation and design 
+● Create simple, reactive AI using state machine principles 
+● Consider multi-device experience design. 
+ 
+AIM 
+Form a team of 3 within your class. 
+This is a studio-based integrated project involving DUX, I3E, 3RT, STLD. You are required to fulfil the 
+following core requirements: 
+ 
+Module DUX 13E 
+Requirements 
+Produce a complementing prototype counterpart for 
+the 3D Virtual Experience on another platform, with 
+focus on planning for multi-device experience. 
+  
+Features of the complementary prototype should link 
+to the main 3D Virtual Experience. Ensure fluid and 
+seamless experience across devices in mind to 
+achieve certain goals. 
+ 
+Create simple entities following the FSM design 
+pattern and have them react to the actions of the 
+users (e.g. stealing/destroying a sacred item 
+makes AI aggressive). 
+ 
+Usage of Unity’s Navigation system to create 
+entities that can navigate an environment (e.g. 
+patrolling, chasing, following commands). 
+ 
+Usage of Git and GitHub Desktop to manage the 
+project and collaborate with groupmates. 
+ 
+STLD 3RT 
+To design & build a game/ virtual level with the Unity 
+Game engine 
+ 
+Produce a Game Design Document with focus on 
+Level Design 
+ 
+Produce a walkthrough video to showcase the level 
+ 
+To implement modular level design approach to build 
+the level 
+ 
+Produce modular assets for interior spatial 
+construction - so factor interior environment in 
+project. 
+ 
+Note: decorative props for set dressing that do 
+not help with flexible spatial construction is not 
+considered as main spatial modular assets to 
+build. 
+ 
+Visual research references 
+ 
+Supporting VFX using Unity Shuriken Particle 
+System or VFX Graph 
+ 
+
+=== PAGE BREAK ===
+
+Official Open  
+ 
+END GOAL: 3D Virtual Experience with Theme based on: 
+    1. Delta Challenge 2026  -- or --  
+    2. Tutors Approved Your Own BIG IDEA    
+Your end product will be assessed based on the following criteria: 
+1. Technical production, smoothness of flow, through testing to ensure no bugs 
+2. Visual, textual cues used to allow for feedback 
+3. Mindful consideration to user experience and usability 
+4. Interactivity and Engagement value of prototype 
+5. Usage of 3D models 
+6. Project management using Scrum & Jira 
+7. Appropriate Source code management 
+8. Overall appeal and integration of project 
+ 
+You may want to ask yourself the following questions as you go along: 
+● What kind of users will be using the application? 
+● Interactivity of virtual world 
+● Did I test my users? 
+ 
+IDEAs proposed to be finalized by WEEK 14 with individual module tutors. 
+Main Concept to be cleared with your I3E & STLD tutors
+
+=== PAGE BREAK ===
+
+Official Open  
+KEY MODULE DELIVERABLES 
+ 
+For DUX - Complementing Prototype & Documentation 
+1. Produce a complementing digital prototype that supports the 3D Virtual Living World 
+using Figma. Conceptualize ideas for supporting features to complement your 
+MAIN product. It should NOT be the same 3D Virtual Living World on another 
+platform but propose only features that are necessary and applicable for its form 
+factor. 
+  
+2. Plan for seamless multi-device design, applying a higher conceptual way of thinking. 
+Create experiences with the appropriate devices in the appropriate situations to help 
+users accomplish their goals. 
+  
+3. Possible product form: 
+● Mobile / Tablet App 
+● Interactive Kiosk 
+● Smart Watch App 
+● Digital Installation / Projection 
+● Arcade Machine 
+● Any other device with digital Graphical User Interface (GUI) for interaction 
+  
+4. Produce a proposal with considerations and planning of various aspects of User 
+Experience Design. 
+ 
+ 
+DUX Guiding Factors & Tasks 
+Guiding Factors 
+1. How do I make the usage process more intuitive, ‘obvious’ and efficient? 
+2. How can I ensure that the user task flow is logical? 
+3. What are the qualities of a great application and how to execute them? 
+4. What are some of the implications that the extensive use of gadgets / hardware can bring 
+about? 
+ 
+Tasks - for Figma Prototype 
+1. To propose at least FIVE core functionalities. Propose additional features as you deem 
+necessary. 
+2. Utilizing Figma plugin, come up with possible use-case(s) (in at least one of the features) to 
+integrate Google Sheets’ real content and data into your Figma prototype. Possibilities 
+include Leaderboard, statistics, scoring, player data etc. It should be a fully functioning data 
+retrieval process. 
+3. As this is a proof-of-concept, Figma prototype need NOT be programmatically / network 
+linked to the main 3D Virtual Living World on UNITY. You can use User Journey and User 
+Flow diagrams to show the cross-platform flow (if any).
+
+=== PAGE BREAK ===
+
+Official Open  
+ 
+Tasks - for Proposal 
+1. Professionally packaged Proposal 
+2. Overview / background of concept behind Figma prototype 
+3. Features with detailed descriptions 
+4. Persona of a real user 
+5. User Journey + User Flows (for the whole ‘eco-system’) 
+6. Sitemap 
+7. Hardware Components Research 
+ 
+Within your team, conduct research on some of the potential hardware that you can utilize. 
+For the various hardware components, you do not have to go into details for the technical 
+specifications, but your team will have to shortlist a list of potential products that can 
+support the various functionalities of your proposed concept. 
+ 
+Your research report must be as descriptive and informative as possible, complete with 
+supporting screenshots and diagrams to explain your decision's rationale. 
+ 
+8. Physical Component Design (If applicable) 
+ 
+Your team is required to conceptualize and 
+design a digital mock-up of the physical 
+component design (using Photoshop or 
+otehr suitable tool) if you are proposing a 
+system that requires physical setup (i.e. 
+kiosk, digital installation, point-of-sale 
+systems). 
+Do provide the approximate real-life 
+physical dimensions in Centimeters 
+(cm). Placement of hardware (i.e. screen, 
+camera and other input devices) must be at 
+an optimal height with reference to good 
+user experience practices. 
+ 
+9. Usability Testing Plan 
+a. With your Persona as your test subject, to conduct Usability testing for: 
+i. Figma Prototype 
+ii. 3D Virtual Living World on UNITY 
+b. Description of process involved 
+c. Software / technology used 
+d. Additional Details (ie.to include subtitles / music in video) 
+e. Written script - Feedback report. You can use templates, remember to provide credits to 
+the sources 
+
+
+=== PAGE BREAK ===
+
+Official Open  
+10. Project Plan on JIRA (From Week 14 – 17) 
+a. Consistent updates to account for weekly checkpoints 
+b. Logging down and updating of status of all required tasks for ALL modules 
+c. Clear assignment of tasks to specific members 
+ 
+11. Credits / References / Wireframes / Sketches 
+ 
+ 
+ 
+AI declaration form  
+ 
+ 
+DUX SUBMISSION DELIVERABLES 
+Item(s) Naming Convention Submission Channel 
+(Only the team leader needs to submit) 
+1  
+DUX_<NameOfApp>_Proposal.pdf 
+Zip up items 1 & 2 - 
+DUX_TeamName_Asg2.zip 
+ 
+OneDrive > P0x > GroupName > DUX 
+ 
+DO NOT zip up these documents with your 
+other UNITY files 
+2  
+DUX_<NameOfApp>_Prototype 
+3  
+DUX_<NameOfApp>_Usability 
+Testing_Prototype.mp4 
+ 
+DUX_<NameOfApp>_Usability 
+Testing_UNITY.mp4 
+Upload .mp4 files to TWO channels: 
+OneDrive > P0x > GroupName > DUX 
+AND iVid2 
+ 
+Grant sharing EDIT permission to ALL 
+tutors 
+ Ms. Dai - dmh2@np.edu.sg 
+ Ms. Anita - ran5@np.edu.sg 
+            
+ Include video links within proposal 
+Double-check access permissions 
+ 
+--- End of DUX Requirements --- 
+
+=== PAGE BREAK ===
+
+Official Open  
+For I3E - Living Virtual Environment 
+1. To create a living virtual environment with NPCs or/and enemies that will react to the 
+actions of the user. 
+2. To utilize the Navigation system of Unity and implement simple enemy or follower 
+mechanics. 
+3. To use raycasting and features from the Unity Physics system to implement mechanics. 
+4. To generate properly documented code with XML comments and file headers. 
+5. To utilize GitHub Desktop and version control concepts to manage the project. 
+ 
+I3E Guiding Factors & Tasks 
+1. Use the Player class from previous work to get a simple working character. 
+2. Block out your environment and bake NavMeshes on them. 
+3. Plan out the behaviors and states that your NPCs/enemies will have. 
+a. Each teammate should plan and implement at least one FSM. 
+4. Test and debug often. 
+5. Communicate with your groupmates and have them share their work regularly. 
+6. Create file headers and code comments as you code, and not just before submission. 
+ 
+ 
+Interactive 3D Environment (I3E) Submission 
+Item(s) Naming Convention Submission Channel 
+(Only the team leader need to submit) 
+1 I3E_<NameOfApp>_Project.zip 
+● This zip file must contain your entire project with 
+all assets necessary to run the project included. 
+OneDrive > P0x > GroupName > I3E 
+2 I3E_<NameOfApp>_Build.zip 
+● This zip file must contain the build folder with the 
+necessary files to run the application. 
+3 I3E_<NameOfApp>_ReadMe.pdf 
+● This pdf file must detail the controls of the 
+application. 
+● It must detail any limitations/bugs of the 
+application. 
+● It must include the FSM diagram and 
+implementation details of each AI. 
+● It must include answers to any puzzles. 
+● It must have references and credits to external 
+assets 
+ 
+* You may want to upload all other relevant working files (PhotoShop, MAYA, InDesign, Premiere etc) into Microsoft 
+OneDrive as a form of backup. 
+ 
+--- End of I3E Requirements --- 
+
+=== PAGE BREAK ===
+
+Official Open  
+For STLD - SPATIAL THEORY & LEVEL DESIGN 
+1. To design & build a game level with the Unity Game engine 
+2. Produce a Game Design Document with focus on Level Design 
+3. Implement modular level design approach to build the level/ prototype in Unity 
+4. Apply unity terrain toolkit to build the level 
+5. Understand how to test and refine a game level 
+6. Understand lighting theory and capable to render proper ambient and atmosphere of a game 
+level 
+7. Apply level design optimization 
+ 
+STLD Guiding Factors & Tasks 
+1. Visual research work for reference before embarking on Level design 
+2. Applying Spatial Theory to design & prototype the level 
+3. Design the game flow, rhythm, & gameplay mechanics (design the environment to facilitate 
+game play, deploying enemies, puzzles, quests, etc… create a rhythm of exciting events & 
+gameplay) 
+4. Using ProBuilder, Grids, and any other relevant toolkit to design the level using the modular 
+level building techniques 
+5. Assemble the modular pieces to build the full gameplay environment in Unity 
+6. Design and build terrain in Unity 
+7. All modular piece need be built on your own, no store assets are allowed. Any exceptions do 
+seek permission from your tutors 
+ 
+STLD Submission 
+Item(s) Naming Convention Submission Channel 
+(Only the team leader needs to 
+submit) 
+1 STLD_ <NameOfApp> _GDD.pdf 
+A full game design document (GDD)which includes 
+details on the Level Design 
+Level Design portion must include 
+- Level abstract 
+- Bubble diagram/ Flow/ Rhythm 
+- Level map 
+- Asset List 
+ 
+OneDrive > P0x > GroupName > 
+STLD 
+2 STLD_ <NameOfApp> _Walkthrough.mp4 
+Level Walk through video 
+ 
+ 
+ 
+--- End of STLD Requirements ---
+
+=== PAGE BREAK ===
+
+Official Open  
+For 3RT - Game Assets, Lighting & Post Processing, VFX 
+1. Modular assets for flexible spatial interior environment construction are required to be built for the 
+project. 
+2. Must create from scratch the assets required to build at least 1 entire room (meaning no 
+Unity Asset Store, Sketchfab, or any online free 3D meshes.) 
+3. Texture modular assets with texture atlas/trim sheet texturing method. 
+4. Utilize proper lighting techniques (lightmap baking with mixed mode lights) 
+5. Apply post processing techniques (not just Bloom, explore Color Toning, and Vignette also). 
+6. Create appropriate VFX. 
+ 
+3RT Guiding Factors & Tasks 
+In consideration of 3 or 4 members (say A, B, & C [or C, & D]) 
+1. Visual research work for reference before embarking on 3D modelling with PureRef (teamwork) 
+2. 3D Modelling – spatial modular assets and set dressing prop modular assets by member A 
+(Note: If there is a 4th member D, have member A do spatial modular assets, and member 
+D do set dressing prop modular assets.) 
+3. Member B to create texture atlas/trimsheet and texture modular assets. 
+4. Trim sheet should be used on X3 (or X4 for 4-member team) or more assets (UV unwrap 
+and layout work should be done by member B). 
+5. Member C to create X3 (or X4 for 4-member team) VFX at least to be used in scene. 
+6. Set up mixed mode lighting and bake lightmaps in Unity (teamwork) 
+7. Apply post processing in Unity (teamwork) 
+8. Naming convention for the file should be eg. 3RT_<NameOf 
+App>_<AssetName>.<format> (see yellow highlighted naming conventions below for 
+each deliverable) 
+ 
+ 
+3D for Real Time (3RT) Submission 
+Item(s) 
+1 
+Naming Convention 
+3RT_<NameOfApp>.zip 
+ PurRref Visual Research file 
+3RT_<NameOfApp>_PureRef.pur 
+ .zip file of all the texture atlas/trimsheet texture 
+set used for modular assets texturing and a 
+screenshot image of textured modular assets 
+with indication of who did the texturing. 
+3RT_<NameOfApp>_tSheetAtlas.zip 
+ .fbx file of modular assets created 
+accompanied with a screenshot image of 
+textured modular assets with indication of who 
+did 3D modelling of modular assets. 
+3RT_<NameOfApp>_mAssets.fbx 
+3RT_<NameOf App>_mAssets.png 
+ Video Capture of VFX done by team clearly 
+indicating who created them. 
+Submission Channel 
+(Only the team leader needs to submit) 
+OneDrive > P0x > GroupName > 3RT 
+
+=== PAGE BREAK ===
+
+Official Open  
+3RT_<NameOfApp>_VFX.mp4 
+ Video Capture showing the following in Unity 
+Project (you can narrate as you show): 
+▪ There are no repeated texture sets. 
+▪ Prefab is done properly for modular pieces 
+in Hierarchy menu. 
+▪ Non-moving mesh are set to static; all 
+lights are set to mixed mode. 
+▪ Baked lightmaps. 
+▪ Post Processing settings and that the 
+game camera’s Post Process parameter is 
+ticked. 
+3RT_<NameOfApp>_UPrjShow.mp4 
+ 
+ 
+--- End of 3RT Requirements --- 
+
+=== PAGE BREAK ===
+
+Official Open  
+SUBMISSION CHECKPOINTS 
+Please note that there are milestone submissions / presentations, during class. 
+ 
+    
+ 
+ 
+WEEK 
+ 
+ 
+ 
+WHEN 
+ 
+ 
+ 
+WHAT  
+ 
+ 
+WHERE? 
+14 20 Jul - 26Jul 2026 
+(Whitespace Week) Checkpoint 1 (2%) 
+Ad hoc consultation with tutors to confirm 
+concept; Visual References (3RT) 
+ 
+Online 
+15 27 Jul - 2 Aug 2026 
+ 
+Tuesday, 9am to 5pm. 
+ 
+Tutors will move from 
+class to class to check 
+on your progress. 
+ 
+Checkpoint 2 (2%) 
+Firm up idea & start working on GDD (STLD) 
+Environmental Modular Asset Building 
+(3RT) 
+Project & GitHub setup and AI planning (I3E) 
+Finalizing of Concept & Proposed Features 
+for Digital Counterpart, Low Fidelity 
+prototype, Jira weekly updates (DUX) 
+ 
+F2F  
+M01: 
+27-04-13 
+M02: 
+27-04-14 
+M03: 
+31-04-03 
+ 
+ 
+ 
+ 
+ 
+ 
+16 
+ 
+3 Aug - 9 Aug 2026 
+ 
+Tuesday, 9am to 5pm. 
+ 
+Tutors will move from 
+class to class to check 
+on your progress. 
+ 
+Checkpoint 3 (3%) 
+Complete GDD (STLD) 
+Whiteboxing in Unity (STLD) 
+Trim sheet/Texture Atlas building (3RT) 
+Reactive AI Mechanics (I3E) 
+High Fidelity prototype, Jira weekly updates 
+(DUX) 
+F2F  
+M01: 
+27-04-13 
+M02: 
+27-04-14 
+M03: 
+31-04-03 
+ 
+ 
+ 
+ 
+17 
+ 
+ 
+10 Aug – 16 Aug 2026 
+ 
+Tuesday, 9am to 5pm. 
+ 
+Tutors will move from 
+class to class to check 
+on your progress. 
+ 
+Checkpoint 4 (3%) 
+Trim sheet/Texture Atlas submission (3RT) 
+VFX Integration (3RT) 
+Whitebox level with Modular assets 
+(STLD)  
+Finalized mechanics implementation (I3E)  
+Usability Test Plan, Finalizing High Fidelity Prototype, 
+Jira weekly updates (DUX) 
+F2F  
+M01: 
+27-04-13 
+M02: 
+27-04-14 
+M03: 
+31-04-03 
+17 FRI, 14 Aug 2026 
+(0900h) - TBC 
+Cohort Project Showcase VIVA / Assessment 
+LT Presentation 
+Gallery  
+17 Fri ,14 Aug 2026 
+(2359h) 
+ 
+All Deliverables Submission for All modules  
+ 
+Final Common Submission & Deliverables 
+10 -15 min Presentation Slides that summarizes your project for pitching to your Lecturers 
+● Screenshots and/or video trailer 
+● Description of major features 
+● Unique Selling Point 
+● Anything else that will help ‘sell’ your ideas (e.g. Poster) 
+● Submit to OneDrive > P0X > GroupName > Presentation & Marketing 
+
+=== PAGE BREAK ===
+
+Official Open  
+ 
+DUE DATES 
+VIVA presentation materials due on 
+Final Assignment due on 
+Week 17 , 14h August 2026, 2359h 
+ 
+ 
+DUX I3E 
+▪ UX Test, Research & Documentation Quality (40%) 
+▪ Prototyping & UX (30%) 
+▪ Individual Contribution (20%) [see below] 
+▪ Checkpoints (10%) 
+▪ Technical Competency (30%) 
+▪ Interactivity (10%) 
+▪ UI/UX (10%) 
+▪ Game Juice (10%) 
+▪ Git Management (10%) 
+▪ Individual Contribution/ Peer Review (20%) 
+[see below] 
+▪ Checkpoints (10%) 
+3RT STLD 
+▪ Visual Research (2.5%) 
+▪ Modular Asset (22.5%) 
+▪ Trim Sheet/Text Atlas Texturing (22.5%) 
+▪ VFX (4.5%) 
+▪ Lighting (10%) 
+▪ Post Process (4%) 
+▪ Build Success (4%) 
+▪ Individual Contribution (20%) [see below] 
+▪ Checkpoints (10%) 
+▪ Game Design Document (25%) 
+▪ Implementation of level 
+o Layout & Design (20%) 
+o Game Play Experience 15%) 
+▪ Walk through video (10%) 
+▪ Individual Contribution/ Peer Review (20%) 
+▪ Checkpoints (10%) 
+Applicable to all Modules 
+Checkpoints (10%) 
+ 
+Individual Contribution (20%) 
+▪ Project management & Progress (Project management with Scrum & Jira/ Checkpoints) 
+▪ Individual Contribution/ Peer Review 
+▪ VIVA/ Presentation 
+▪ Presentation Attire 
+ 
+[Unity] 
+▪ To create a project with Unity 6 using the URP template 
+ 
+[Project Management] 
+▪ To implement the SCRUM framework using Jira 
+o https://www.atlassian.com/software/jira/free 
+▪ Create from Software Development Project template – Scrum 
+▪ Select a team-managed project 
+▪ Add all the tutors for this Studio 2 (Integrated Project) 
+ 
+[Bonus] 
+▪ A poster to promote the app/game 
+o <NameOfApp> _Poster.mp4 
+▪ A trailer to promote the app/game 
+o <NameOfApp> _Poster.mp4 
+LATE SUBMISSION 
+Late submission will be penalised (10% of the marks for each day late after 12 noon). Submission 
+
+=== PAGE BREAK ===
+
+Official Open  
+will not be accepted after 5 days (including weekends and public holidays) from the date of 
+submission. 
+ 
+PLAGIARISM AND COPYRIGHT ISSUES 
+Plagiarism means, “copying any part of a source, and then submitting it, claiming that it is your own 
+work.” 
+ 
+Please ensure that all the works submitted by you are not copied from other sources. Any attempt to 
+plagiarize will be dealt with severely, and it may result in your failing the module. 
+ 
+If you have made any references to certain materials, make sure you cite the sources by 
+acknowledging and providing the information necessary to find the source (e.g. Title and author of 
+book, Internet links, etc) 
+ 
+DUE DATES 
+VIVA presentation materials due on 
+Final Assignment due on 
+Week 17 ,14th August 2026, 2359h 
+ 
+ 
+ 
+--- End of Brief --- 

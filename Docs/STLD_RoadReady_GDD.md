@@ -176,23 +176,13 @@ The overhead view explains the whole incident, but the pedestrian and driver vie
 
 ## 5. Bubble Diagram, Flow and Rhythm
 
-### 5.1 Preliminary Bubble Diagram
+### 5.1 Bubble Diagram
 
-```mermaid
-flowchart LR
-    A["Training or Briefing"] --> B["Incident Observation"]
-    B --> C["Investigation Hub"]
-    C --> D["Pedestrian Evidence"]
-    C --> E["Vehicle Evidence"]
-    C --> F["Environmental Evidence"]
-    D --> G["Intervention Start"]
-    E --> G
-    F --> G
-    G --> H["Changed Outcome"]
-    H --> I["Debrief"]
-```
+![Road Ready bubble diagram showing the level spaces, gameplay flow and investigation branches](STLD_Assets/STLD_RoadReady_BubbleDiagram.png)
 
-**[ADD EVIDENCE]** Replace this with the final bubble diagram after the spaces and connections are confirmed. Show the relative size of each space, main route, optional routes and activity points.
+**Figure 5.1. Road Ready level bubble diagram.** Solid arrows show the required phase flow, while dashed arrows show areas that the player may explore in any order before returning to the main crossing. Bubble size represents each area's relative importance and amount of activity rather than its exact physical size.
+
+The crossing is the largest bubble because it acts as the level's main landmark and investigation hub. The pedestrian, vehicle and environmental clue areas form short branches around it, allowing the player to compare both road users without travelling through separate levels. The same crossing is reused for observation, investigation, intervention and resolution, but the camera, available interactions and level pacing change between phases.
 
 ### 5.2 Gameplay Flow and Rhythm
 
