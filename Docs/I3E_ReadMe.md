@@ -74,18 +74,25 @@ The investigation has no timer, so players can look around at their own pace. Th
 
 ### Controls
 
-| Input                       | Action                                              |
-| --------------------------- | --------------------------------------------------- |
-| `W`, `A`, `S`, `D`          | Move                                                |
-| `Mouse`                     | Look around and aim the crosshair                   |
-| `Left Shift`                | Sprint                                              |
-| `Space`                     | Jump                                                |
-| `Left Mouse Button`         | Examine, speak or interact                          |
-| `Q` or `Right Mouse Button` | Leave a point-of-view camera or passenger seat      |
-| `Enter`                     | Continue to the next part of the experience         |
-| `Escape`                    | Open the pause menu or back out of the current view |
+| Input                       | Gamepad      | Action                                              |
+| --------------------------- | ------------ | --------------------------------------------------- |
+| `W`, `A`, `S`, `D`          | Left stick   | Move                                                |
+| `Mouse`                     | Right stick  | Look around and aim the crosshair                   |
+| `Left Shift`                | Left trigger | Sprint                                              |
+| `Space`                     | A            | Jump                                                |
+| `Left Mouse Button` or `E`  | A            | Examine, speak or interact                          |
+| `Q` or `Right Mouse Button` | B            | Leave a point-of-view camera or passenger seat      |
+| `F`                         | Y            | Hide the steering wheel while in the driver's seat   |
+| `Enter`                     | Start        | Continue to the next part of the experience         |
+| `Escape`                    | -            | Open the pause menu or back out of the current view |
+
+All controls are defined in a Unity Input Action Asset, so keyboard, mouse and gamepad are supported from the same set of actions.
 
 The same crosshair is used while walking, sitting inside the car and viewing the scene through another person's eyes. Interactive objects highlight when the player is close enough to use them.
+
+The driver sits close to the wheel, so the steering wheel and indicator stalk block the view of the pedals. `F` hides them while the player is in the driver's seat and restores them automatically on the way out.
+
+Before the intervention begins, a confirmation box explains what is about to happen and warns that the investigation cannot be returned to. This stops players from starting the countdown by accident.
 
 ---
 
@@ -195,6 +202,18 @@ The game separately remembers what the player examined and what they changed. Th
 
 Ambient pedestrians, the bystander and the guide move on a baked NavMesh. The two main incident characters use fixed routes instead because their positions must remain the same in every replay.
 
+### Vehicle damage
+
+The car holds two versions of its bodywork. The clean version is shown until the collision is detected, at which point it is hidden and the damaged version takes its place. Shared parts such as the wheels and interior are left out of both lists so they stay put. Loose parts with a Rigidbody are thrown by real physics on impact and returned to their exact starting position on every reset.
+
+This follows our 3RT tutor's advice to swap models rather than deform them, and it suits the game for a second reason: the incident replays many times, and a model swap resets in a single line.
+
+### Code standards
+
+Every script carries a header naming the team, the members and the module. Classes, properties and methods use XML documentation comments, with line comments where the reason for a piece of code is not obvious from reading it.
+
+Each team member designed and implemented one finite state machine, and each is documented in section 4 with its diagram. Shared behaviour lives in base classes so the same logic is not written twice: `ScenarioActor` handles resetting and animation safety, and `PathScenarioActor` handles path following and automatic placement.
+
 ---
 
 ## 7. Testing and Limitations
@@ -208,6 +227,9 @@ The final build was checked using the following tests:
 | Interaction access | Objects can only be changed from the intended position or point of view                 | Passed  |
 | Outcome branching  | Four fixes prevent the collision; partial fixes remain visible in the replay            | Passed  |
 | NavMesh behaviour  | Ambient characters and the guide reach valid destinations without blocking the incident | Passed  |
+| Damage swap        | Damaged bodywork appears only after a collision, and never when it is prevented         | Passed  |
+| Retry              | Score, examined evidence and hidden objects all return to their starting state          | Passed  |
+| Input devices      | Every action works from keyboard and mouse, and from a gamepad                          | Passed  |
 | Build test         | The main menu, game loop, retry option and exit flow work in the standalone build       | Passed  |
 
 ### Known issues
@@ -238,7 +260,12 @@ These choices kept the experience clear, repeatable and suitable for a short cla
 | Unity Starter Assets - First Person Controller                      | Unity Technologies, Unity Companion License        | Player movement and camera controls                 |
 | Mixamo                                                              | Adobe, https://www.mixamo.com                      | Character animation clips                           |
 | FREE Cartoon Car Pack - Simple Vehicles                             | Unity Asset Store, Standard Unity Asset Store EULA | Background and placeholder vehicle assets           |
+| Hero car model with separated interior parts                        | 🔲 _add source link_ — Sketchfab, CC Attribution   | The car involved in the collision                   |
+| Mobile phone model                                                  | 🔲 _add source link_ — Sketchfab, CC Attribution   | The pedestrian's phone                              |
+| Over-ear headphones model                                           | 🔲 _add source link_ — Sketchfab, CC Attribution   | The pedestrian's headphones                         |
 | Cinemachine, AI Navigation, Input System, Timeline and Universal RP | Unity Technologies, Unity Companion License        | Cameras, navigation, input, sequences and rendering |
+
+🔲 **Before submitting:** paste the exact source page for each downloaded model and confirm the licence shown there. The three marked rows currently assume Sketchfab under CC Attribution, which is the most common case, but the licence must be checked and the original author credited by name.
 
 The full asset list, exact source links and licence records are kept in `Docs/CREDITS.md`.
 
