@@ -125,7 +125,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4432622969494928}
   - component: {fileID: 108374899102069224}
-  - component: {fileID: 3708798507783914006}
+  - component: {fileID: 3518373103642272157}
   m_Layer: 0
   m_Name: light
   m_TagString: Untagged
@@ -213,7 +213,7 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!114 &3708798507783914006
+--- !u!114 &3518373103642272157
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -268,9 +268,9 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.8043, y: 1.8043, z: 1.8043}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4436963774163006}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -90.00001, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
