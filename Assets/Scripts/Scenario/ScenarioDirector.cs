@@ -15,6 +15,7 @@ using UnityEngine;
 public enum GamePhase
 {
     Boot,           // nothing yet
+    MainMenu,       // title screen, camera orbiting the level behind it
     Observe,        // bird's-eye, the crash plays at full speed
     FreeRoam,       // clock frozen after the crash, player walks the aftermath
     PovReplay,      // sub-mode of FreeRoam: locked replay through someone's eyes
@@ -55,6 +56,17 @@ public class ScenarioDirector : MonoBehaviour
     [Header("Player positioning")]
     [Tooltip("Empty GameObject on the pavement where the player starts investigating.")]
     [SerializeField] private Transform playerSpawnPoint;
+
+    [Header("Main menu")]
+    /// <summary>
+    /// A Global Volume holding the menu's post-processing look. Switched on only while the
+    /// main menu is showing.
+    ///
+    /// It has to work this way because Cinemachine drives ONE real camera, so every angle
+    /// shares the same post-processing. Toggling the Volume is how you give one "camera" its
+    /// own look.
+    /// </summary>
+    [SerializeField] private GameObject menuPostProcessing;
 
     [Header("Options")]
     [SerializeField] private bool startAutomatically = true;
@@ -130,6 +142,19 @@ public class ScenarioDirector : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// How much of the intervention window is left, from 1 down to 0.
+    /// Drives the progress bar under the countdown.
+    /// </summary>
+    public float InterveneProgress01
+    {
+        get
+        {
+            if (settings == null || settings.interveneLeadTime <= 0f) return 0f;
+            return Mathf.Clamp01(TimeToImpact / settings.interveneLeadTime);
+        }
+    }
+
     // Worked out by a silent dry-run when Intervene begins. -1 until then.
     private float predictedImpactTime = -1f;
 
@@ -147,7 +172,41 @@ public class ScenarioDirector : MonoBehaviour
 
     private void Start()
     {
-        if (startAutomatically) EnterPhase(GamePhase.Observe);
+        if (startAutomatically) EnterPhase(GamePhase.MainMenu);
+    }
+
+    // =====================================================================
+    //  MAIN MENU ACTIONS — wired to the buttons in the Inspector
+    // =====================================================================
+
+    /// <summary>"Start" on the main menu. Begins a fresh run.</summary>
+    public void StartGame()
+    {
+        RetryFromStart();
+    }
+
+    /// <summary>"Back to Main Menu" on the debrief, and anywhere else we want it.</summary>
+    public void ReturnToMainMenu()
+    {
+        if (interventions != null) interventions.ClearAll();
+
+        EvidenceLedger ledger = FindFirstObjectByType<EvidenceLedger>();
+        if (ledger != null) ledger.ClearAll();
+
+        EnterPhase(GamePhase.MainMenu);
+    }
+
+    /// <summary>
+    /// "Quit". Closes the built game. In the Editor this does nothing visible, which is
+    /// normal — the #if block stops the Editor from trying to quit itself.
+    /// </summary>
+    public void QuitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     // =====================================================================
@@ -166,10 +225,28 @@ public class ScenarioDirector : MonoBehaviour
         // Free Roam overrides this below, before its seek.
         if (victim != null) victim.SetWitnessMode(false);
 
+        // The menu's post-processing look belongs to the menu only. Switched back on by
+        // the MainMenu case below.
+        if (menuPostProcessing != null) menuPostProcessing.SetActive(false);
+
         Debug.Log($"<color=cyan>[PHASE]</color> -> <b>{next}</b>");
 
         switch (next)
         {
+            // -------------------------------------------------------------
+            case GamePhase.MainMenu:
+                // The incident is parked at its opening frame so the orbit camera has
+                // something sensible to fly over.
+                runner.ResetScenario();
+                runner.SetTimeScale(1f);
+
+                cameras.Activate(CameraId.StartMenu);
+                SetPlayerActive(false);
+                player.SetCursorLocked(false);   // menu buttons need a cursor
+
+                if (menuPostProcessing != null) menuPostProcessing.SetActive(true);
+                break;
+
             // -------------------------------------------------------------
             case GamePhase.Observe:
                 runner.ResetScenario();

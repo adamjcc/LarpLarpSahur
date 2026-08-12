@@ -87,6 +87,25 @@ public class HazardInteractable : MonoBehaviour, IInteractable
     public string DebriefExplanation => debriefExplanation;
 
     /// <summary>
+    /// Warns in the Inspector if the examine text is too long for its panel.
+    ///
+    /// 110 characters is what fits the examine card without wrapping past the bottom.
+    /// It warns rather than trimming, because silently cutting someone's writing in half
+    /// is worse than telling them to shorten it.
+    /// </summary>
+    private void OnValidate()
+    {
+        const int maxExamineLength = 110;
+
+        if (examineDescription != null && examineDescription.Length > maxExamineLength)
+        {
+            Debug.LogWarning($"[{name}] Examine Description is {examineDescription.Length} " +
+                             $"characters. Keep it under {maxExamineLength} or it will " +
+                             "overflow the panel.", this);
+        }
+    }
+
+    /// <summary>
     /// Puts a hidden object back. Called on Retry.
     ///
     /// Needed because "Hide When Applied" switches the GameObject off permanently. Some

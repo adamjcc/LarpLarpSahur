@@ -55,6 +55,29 @@ public class DialogueSequence : MonoBehaviour
     }
 
     /// <summary>
+    /// Warns in the Inspector if any line is too long for the dialogue panel.
+    ///
+    /// 180 characters is roughly what fits without the text shrinking. Split anything longer
+    /// into two entries — it reads better as two pages anyway.
+    /// </summary>
+    private void OnValidate()
+    {
+        const int maxLineLength = 180;
+
+        if (lines == null) return;
+
+        for (int i = 0; i < lines.Length; i++)
+        {
+            if (lines[i] != null && lines[i].Length > maxLineLength)
+            {
+                Debug.LogWarning($"[{name}] Dialogue line {i + 1} is {lines[i].Length} " +
+                                 $"characters. Keep it under {maxLineLength}, or split it " +
+                                 "into two lines.", this);
+            }
+        }
+    }
+
+    /// <summary>
     /// Called by the dialogue panel's POV button.
     /// </summary>
     public void PlayPovReplay()

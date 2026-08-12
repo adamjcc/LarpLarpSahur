@@ -29,7 +29,15 @@ public class UIManager : MonoBehaviour
     // ---------------------------------------------------------------- wiring
 
     [Header("Always-on HUD")]
+    /// <summary>Parent of both crosshair sprites. Hidden when aiming isn't possible.</summary>
     [SerializeField] private GameObject crosshair;
+
+    /// <summary>Shown when the crosshair is on nothing in particular.</summary>
+    [SerializeField] private GameObject crosshairDefault;
+
+    /// <summary>Shown the instant the crosshair lands on something interactive.</summary>
+    [SerializeField] private GameObject crosshairSelected;
+
     [SerializeField] private TMP_Text promptText;
 
     /// <summary>
@@ -65,6 +73,12 @@ public class UIManager : MonoBehaviour
 
     /// <summary>The words next to the numbers, e.g. "HAZARDS FOUND".</summary>
     [SerializeField] private TMP_Text hazardLabel;
+
+    /// <summary>
+    /// Thin bar under the countdown that drains as the window runs out.
+    /// Its Image Type must be Filled, Fill Method Horizontal.
+    /// </summary>
+    [SerializeField] private Image countdownBar;
 
     [Header("Countdown pulse")]
     /// <summary>How long each kick lasts, in real seconds.</summary>
@@ -113,6 +127,21 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text confirmBody;
     [SerializeField] private Button confirmYesButton;
     [SerializeField] private Button confirmNoButton;
+
+    [Header("Main menu")]
+    /// <summary>The title screen. Shown first, and again from the debrief.</summary>
+    [SerializeField] private GameObject mainMenuPanel;
+
+    /// <summary>Instructions panel opened from the main menu.</summary>
+    [SerializeField] private GameObject howToPlayPanel;
+
+    [SerializeField] private Button startButton;
+    [SerializeField] private Button howToPlayButton;
+    [SerializeField] private Button howToPlayBackButton;
+    [SerializeField] private Button quitButton;
+
+    /// <summary>"Back to Main Menu" on the debrief screen.</summary>
+    [SerializeField] private Button backToMenuButton;
 
     [Header("Debrief")]
     [SerializeField] private GameObject debriefPanel;
@@ -195,6 +224,17 @@ public class UIManager : MonoBehaviour
         if (confirmYesButton != null) confirmYesButton.onClick.AddListener(AcceptConfirm);
         if (confirmNoButton != null) confirmNoButton.onClick.AddListener(CancelConfirm);
 
+        // ---- main menu ----
+        if (startButton != null) startButton.onClick.AddListener(() => director.StartGame());
+        if (quitButton != null) quitButton.onClick.AddListener(() => director.QuitGame());
+        if (backToMenuButton != null) backToMenuButton.onClick.AddListener(() => director.ReturnToMainMenu());
+
+        if (howToPlayButton != null)
+            howToPlayButton.onClick.AddListener(() => SetActive(howToPlayPanel, true));
+
+        if (howToPlayBackButton != null)
+            howToPlayBackButton.onClick.AddListener(() => SetActive(howToPlayPanel, false));
+
         if (examineCloseButton != null) examineCloseButton.onClick.AddListener(CloseExamine);
         if (dialogueNextButton != null) dialogueNextButton.onClick.AddListener(AdvanceDialogue);
         if (dialoguePovButton != null) dialoguePovButton.onClick.AddListener(PlayDialoguePov);
@@ -208,6 +248,7 @@ public class UIManager : MonoBehaviour
         SetActive(debriefPanel, false);
         SetActive(confirmPanel, false);
         SetActive(hazardFoundPanel, false);
+        SetActive(howToPlayPanel, false);
     }
 
     private void Update()
@@ -244,13 +285,42 @@ public class UIManager : MonoBehaviour
 
         GamePhase phase = director.Phase;
 
+        // ---- main menu ----
+        // The menu owns the whole screen, so every other piece of HUD is suppressed while
+        // it is up. Checked first, before anything else gets a chance to show itself.
+        bool inMenu = phase == GamePhase.MainMenu;
+        SetActive(mainMenuPanel, inMenu);
+
+        if (inMenu)
+        {
+            SetActive(crosshair, false);
+            SetActive(phaseBanner, false);
+            SetActive(interveneGroup, false);
+            SetActive(observePanel, false);
+            SetActive(debriefPanel, false);
+            if (promptText != null) promptText.gameObject.SetActive(false);
+            if (controlsHint != null) controlsHint.gameObject.SetActive(false);
+            UpdatePhaseLights(phase, false);
+            return;
+        }
+
+        SetActive(howToPlayPanel, false);
+
+        // ---- what the crosshair is currently on ----
+        IInteractable focused = (interactor != null && !IsModalOpen) ? interactor.Focused : null;
+
         // ---- crosshair: only while aiming at the world, and never behind a panel ----
         bool showCrosshair = director.CanInteract && !IsModalOpen &&
                              Cursor.lockState == CursorLockMode.Locked;
         SetActive(crosshair, showCrosshair);
 
+        // Two sprites, one swapped for the other. Doing it by enabling and disabling rather
+        // than changing a sprite means the "selected" version can be a different size or
+        // colour without any extra code.
+        SetActive(crosshairDefault, showCrosshair && focused == null);
+        SetActive(crosshairSelected, showCrosshair && focused != null);
+
         // ---- interaction prompt ----
-        IInteractable focused = (interactor != null && !IsModalOpen) ? interactor.Focused : null;
         if (promptText != null)
         {
             promptText.gameObject.SetActive(focused != null);
@@ -309,6 +379,9 @@ public class UIManager : MonoBehaviour
             }
 
             if (countdownLabel != null) countdownLabel.text = "SECONDS TO IMPACT";
+
+            // Fill drains from 1 to 0 as the window runs out
+            if (countdownBar != null) countdownBar.fillAmount = director.InterveneProgress01;
 
             PulseCountdown(remaining);
 
@@ -433,27 +506,27 @@ public class UIManager : MonoBehaviour
         switch (phase)
         {
             case GamePhase.Observe:
-                return director.IsObservationPlaying ? "" : "[ENTER] continue";
+                return director.IsObservationPlaying ? "" : "[ENTER] Continue";
 
             case GamePhase.FreeRoam:
-                return "[WASD] move     [LMB] examine or talk     [ENTER] begin intervention";
+                return "[WASD] Move     [LMB] Examine or talk     [ENTER] Begin intervention";
 
             case GamePhase.PassengerSeat:
                 return canHideObstruction
-                    ? "[LMB] examine     [F] hide the wheel     [Q] get out"
-                    : "[LMB] examine     [Q] get out";
+                    ? "[LMB] Examine     [F] Hide the wheel     [Q] Get out"
+                    : "[LMB] Examine     [Q] Get out";
 
             case GamePhase.Intervene:
                 if (director.IsInNpcView)
                 {
                     return canHideObstruction
-                        ? "[LMB] change     [F] hide the wheel     [Q] step back out"
-                        : "[LMB] change     [Q] step back out";
+                        ? "[LMB] Change     [F] Hide the wheel     [Q] Step back out"
+                        : "[LMB] Change     [Q] Step back out";
                 }
-                return "[WASD] move     [LMB] step into their view";
+                return "[WASD] Move     [LMB] Step into their view";
 
             case GamePhase.Debrief:
-                return "[ENTER] try again";
+                return "[ENTER] Try again";
 
             default:
                 return "";
@@ -590,11 +663,18 @@ public class UIManager : MonoBehaviour
     {
         if (hazardFoundPanel == null) return;
 
+        // Nothing on the last one. The phase is about to cut to the replay anyway, and a
+        // congratulation that appears for half a second then vanishes just reads as a glitch.
+        if (found >= total) return;
+
         if (hazardFoundText != null)
         {
-            hazardFoundText.text = found >= total
-                ? $"That's all {total}. Let's see what happens."
-                : $"Good catch — you dealt with {hazardName}.";
+            // Short enough for a pill in the corner. 28 characters is about the limit before
+            // it either wraps or starts shrinking.
+            string label = $"Found: {hazardName}";
+            if (label.Length > 28) label = label.Substring(0, 27) + "…";
+
+            hazardFoundText.text = label;
         }
 
         SetActive(hazardFoundPanel, true);

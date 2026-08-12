@@ -87,6 +87,16 @@ public class PedestrianVictim : PathScenarioActor
     // remembers the last pose we pushed, so we only touch the camera when it changes
     private bool lastPhoneStowed;
 
+    [Header("Ragdoll — optional")]
+    /// <summary>
+    /// Set this up with Unity's Ragdoll Wizard and she is thrown by the collision instead of
+    /// just playing a hit animation. Leave empty and the animation is used on its own.
+    /// </summary>
+    [SerializeField] private RagdollController ragdoll;
+
+    // Which way the car was going when it hit her, used to throw the ragdoll
+    private Vector3 lastImpactDirection;
+
     [Header("Free Roam")]
     [Tooltip("Where she stands as a witness during the investigation. Leave empty and she " +
              "stays wherever the collision left her — which is usually the middle of the road.")]
@@ -230,9 +240,14 @@ public class PedestrianVictim : PathScenarioActor
     /// <summary>
     /// Called by the ImpactDetector the moment the car reaches her.
     /// </summary>
-    public void NotifyStruck()
+    /// <param name="impactDirection">
+    /// Which way the car was travelling, so the ragdoll can be thrown the right way.
+    /// </param>
+    public void NotifyStruck(Vector3 impactDirection = default)
     {
         if (state == State.Struck || state == State.Aftermath) return;
+
+        lastImpactDirection = impactDirection;
         GoTo(State.Struck);
     }
 
@@ -265,7 +280,15 @@ public class PedestrianVictim : PathScenarioActor
                 // Skipped in witness mode. Free Roam re-simulates straight through the
                 // collision to reach the aftermath, so without this she would replay the
                 // fall every single time you cut back to the investigation.
-                if (!witnessMode) SetAnimTrigger("Hit");
+                if (!witnessMode)
+                {
+                    SetAnimTrigger("Hit");
+
+                    // If a ragdoll is set up, physics takes over and throws her along the
+                    // car's direction of travel. Purely cosmetic — the collision has already
+                    // been decided by then, so it does not have to be repeatable.
+                    if (ragdoll != null) ragdoll.Launch(transform.forward * -1f + lastImpactDirection);
+                }
                 break;
 
             case State.Safe:
@@ -281,6 +304,10 @@ public class PedestrianVictim : PathScenarioActor
 
         state = State.Walking;
         timeInState = 0f;
+
+        // Rebuild the skeleton before the Animator takes over again, or the second replay
+        // would begin with her folded into whatever shape the ragdoll left her in.
+        if (ragdoll != null) ragdoll.SetRagdollActive(false);
 
         // Apply the player's interventions from scenario time zero.
         // This is what makes the Resolve replay show "she never had her phone out".

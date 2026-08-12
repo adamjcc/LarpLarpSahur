@@ -21,7 +21,8 @@ public enum CameraId
     PedestrianPov,      // through her eyes  (locked during replay)
     DriverPov,          // through his eyes  (locked during replay)
     PassengerSeat,      // sitting beside the driver, talking to him
-    Resolve             // the cinematic "what if" replay at the end
+    Resolve,            // the cinematic "what if" replay at the end
+    StartMenu           // slow orbit around the level, behind the main menu
 }
 
 /// <summary>

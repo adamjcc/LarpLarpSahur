@@ -77,7 +77,8 @@ public class ImpactDetector : ScenarioActor
         hasImpacted = true;
         impactedAtTime = now;
 
-        pedestrian.NotifyStruck();
+        // Pass on which way the car was travelling, so a ragdoll gets thrown the right way
+        pedestrian.NotifyStruck(vehicle.transform.forward);
         vehicle.NotifyImpact();
 
         if (logToConsole && !Silent)
