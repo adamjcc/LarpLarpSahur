@@ -7,7 +7,9 @@
  * The phase state machine. The spine of the whole game.
  */
 
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// The phases of the game.
@@ -16,6 +18,7 @@ public enum GamePhase
 {
     Boot,           // nothing yet
     MainMenu,       // title screen, camera orbiting the level behind it
+    Briefing,       // the police office: walk up to the trainer and hear why you are here
     Observe,        // bird's-eye, the crash plays at full speed
     FreeRoam,       // clock frozen after the crash, player walks the aftermath
     PovReplay,      // sub-mode of FreeRoam: locked replay through someone's eyes
@@ -68,6 +71,14 @@ public class ScenarioDirector : MonoBehaviour
     /// </summary>
     [SerializeField] private GameObject menuPostProcessing;
 
+    [Header("Briefing scene")]
+    /// <summary>
+    /// Name of the police office scene, exactly as it appears in Build Settings.
+    /// Loaded ALONGSIDE this scene rather than replacing it, so nothing here is destroyed.
+    /// </summary>
+    [Tooltip("Must match the scene name in File > Build Settings exactly.")]
+    [SerializeField] private string briefingSceneName = "Start Office";
+
     [Header("Options")]
     [SerializeField] private bool startAutomatically = true;
     [SerializeField] private bool debugKeys = true;
@@ -108,7 +119,8 @@ public class ScenarioDirector : MonoBehaviour
     /// </summary>
     public bool CanInteract =>
         !UIManager.ModalBlockingInput &&
-        (phase == GamePhase.FreeRoam ||
+        (phase == GamePhase.Briefing ||
+         phase == GamePhase.FreeRoam ||
          phase == GamePhase.PassengerSeat ||
          phase == GamePhase.Intervene);
 
@@ -179,20 +191,105 @@ public class ScenarioDirector : MonoBehaviour
     //  MAIN MENU ACTIONS — wired to the buttons in the Inspector
     // =====================================================================
 
-    /// <summary>"Start" on the main menu. Begins a fresh run.</summary>
+    /// <summary>"Start" on the main menu. Clears any old progress and opens the briefing.</summary>
     public void StartGame()
     {
-        RetryFromStart();
+        ClearProgress();
+        EnterPhase(GamePhase.Briefing);
     }
 
-    /// <summary>"Back to Main Menu" on the debrief, and anywhere else we want it.</summary>
-    public void ReturnToMainMenu()
+    // =====================================================================
+    //  THE BRIEFING SCENE
+    // =====================================================================
+
+    // True while Start Office is loaded on top of this scene
+    private bool briefingLoaded;
+
+    /// <summary>
+    /// Loads the police office alongside this scene, then puts the player inside it.
+    ///
+    /// This is a coroutine because loading takes more than one frame — we cannot move the
+    /// player to the spawn marker until the scene carrying that marker actually exists.
+    /// </summary>
+    private IEnumerator LoadBriefingScene()
+    {
+        // Take control away while the scene streams in, so the player cannot walk off
+        SetPlayerActive(false);
+
+        if (!briefingLoaded)
+        {
+            if (string.IsNullOrEmpty(briefingSceneName))
+            {
+                Debug.LogError("[ScenarioDirector] No briefing scene name set. Skipping " +
+                               "straight to the incident.", this);
+                EnterPhase(GamePhase.Observe);
+                yield break;
+            }
+
+            yield return SceneManager.LoadSceneAsync(briefingSceneName, LoadSceneMode.Additive);
+            briefingLoaded = true;
+        }
+
+        // The marker lives in the office scene, so it can only be found once that scene
+        // has finished loading. Cross-scene references are not allowed in the Inspector.
+        BriefingSpawnPoint spawn = FindFirstObjectByType<BriefingSpawnPoint>();
+
+        if (spawn != null)
+        {
+            player.Teleport(spawn.transform);
+        }
+        else
+        {
+            Debug.LogWarning($"[ScenarioDirector] '{briefingSceneName}' has no " +
+                             "BriefingSpawnPoint, so the player was left where they were. " +
+                             "Add one to an empty GameObject in that scene.", this);
+        }
+
+        SetPlayerActive(true);
+    }
+
+    /// <summary>
+    /// Called by the last button of the trainer's dialogue. Closes the office and starts
+    /// the incident.
+    /// </summary>
+    public void FinishBriefing()
+    {
+        EnterPhase(GamePhase.Observe);
+    }
+
+    /// <summary>
+    /// Removes the office scene from memory. Called automatically whenever we leave the
+    /// briefing, so the geometry is not sitting around for the rest of the game.
+    /// </summary>
+    private void UnloadBriefingScene()
+    {
+        if (!briefingLoaded) return;
+
+        briefingLoaded = false;
+
+        Scene scene = SceneManager.GetSceneByName(briefingSceneName);
+        if (scene.isLoaded) SceneManager.UnloadSceneAsync(scene);
+    }
+
+    /// <summary>Wipes what the player found and changed. Shared by Start and Retry.</summary>
+    private void ClearProgress()
     {
         if (interventions != null) interventions.ClearAll();
 
         EvidenceLedger ledger = FindFirstObjectByType<EvidenceLedger>();
         if (ledger != null) ledger.ClearAll();
 
+        // Bring back anything that hid itself when it was fixed
+        HazardInteractable[] hazards = FindObjectsByType<HazardInteractable>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        foreach (HazardInteractable h in hazards) h.RestoreVisual();
+    }
+
+    /// <summary>"Back to Main Menu" on the debrief, and anywhere else we want it.</summary>
+    public void ReturnToMainMenu()
+    {
+        ClearProgress();
         EnterPhase(GamePhase.MainMenu);
     }
 
@@ -214,6 +311,10 @@ public class ScenarioDirector : MonoBehaviour
     // =====================================================================
     public void EnterPhase(GamePhase next)
     {
+        // Close the office the moment we leave the briefing, whichever way we leave it —
+        // the dialogue button, a debug key, or going back to the menu.
+        if (next != GamePhase.Briefing) UnloadBriefingScene();
+
         phase = next;
 
         // Any phase change drops you out of someone's eyes, and clears whatever
@@ -245,6 +346,18 @@ public class ScenarioDirector : MonoBehaviour
                 player.SetCursorLocked(false);   // menu buttons need a cursor
 
                 if (menuPostProcessing != null) menuPostProcessing.SetActive(true);
+                break;
+
+            // -------------------------------------------------------------
+            case GamePhase.Briefing:
+                // The incident sits paused at its opening frame across the map while the
+                // player is in the office. Nothing here is destroyed, so every reference
+                // the director holds is still valid when they come back.
+                runner.ResetScenario();
+                runner.SetTimeScale(1f);
+
+                cameras.Activate(CameraId.PlayerFirstPerson);
+                StartCoroutine(LoadBriefingScene());
                 break;
 
             // -------------------------------------------------------------
@@ -415,6 +528,7 @@ public class ScenarioDirector : MonoBehaviour
 
         switch (phase)
         {
+            case GamePhase.Briefing:
             case GamePhase.FreeRoam:
                 SetPlayerActive(true);
                 break;
@@ -611,18 +725,9 @@ public class ScenarioDirector : MonoBehaviour
     /// </summary>
     public void RetryFromStart()
     {
-        if (interventions != null) interventions.ClearAll();
+        ClearProgress();
 
-        EvidenceLedger ledger = FindFirstObjectByType<EvidenceLedger>();
-        if (ledger != null) ledger.ClearAll();
-
-        // Bring back anything that hid itself when it was fixed. Include inactive, or the
-        // objects we most need to find are the exact ones we cannot see.
-        HazardInteractable[] hazards = FindObjectsByType<HazardInteractable>(
-            FindObjectsInactive.Include, FindObjectsSortMode.None);
-
-        foreach (HazardInteractable h in hazards) h.RestoreVisual();
-
+        // Straight back to the incident, not the office — nobody wants the briefing twice.
         EnterPhase(GamePhase.Observe);
     }
 
@@ -644,6 +749,7 @@ public class ScenarioDirector : MonoBehaviour
         // Unity happened to update first.
         if (UIManager.ModalBlockingInput) return;
 
+        if (Input.GetKeyDown(KeyCode.G)) EnterPhase(GamePhase.Briefing);
         if (Input.GetKeyDown(KeyCode.Z)) EnterPhase(GamePhase.Observe);
         if (Input.GetKeyDown(KeyCode.X)) EnterPhase(GamePhase.FreeRoam);
         if (Input.GetKeyDown(KeyCode.C)) PlayPovReplay(CameraId.PedestrianPov);

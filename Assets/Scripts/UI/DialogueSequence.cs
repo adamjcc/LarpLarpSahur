@@ -24,20 +24,51 @@ public class DialogueSequence : MonoBehaviour
     [TextArea(2, 5)]
     [SerializeField] private string[] lines;
 
-    [Header("Point-of-view button")]
-    [Tooltip("Show a second button on the LAST page that replays the final seconds through " +
-             "this person's eyes.")]
-    [SerializeField] private bool offerPovReplay = true;
+    /// <summary>What the extra button on the last page does, if there is one.</summary>
+    public enum FinalButtonAction
+    {
+        /// <summary>No extra button. The player just leaves.</summary>
+        None,
 
-    [SerializeField] private string povButtonLabel = "See what she saw";
+        /// <summary>Replays the incident through this person's eyes.</summary>
+        PlayPovReplay,
+
+        /// <summary>Runs whatever is wired into On Final Button in the Inspector.</summary>
+        CustomEvent
+    }
+
+    [Header("Button on the last page")]
+    /// <summary>What the extra button does, or None to leave it off.</summary>
+    [Tooltip("Play Pov Replay for the two people in the crash.\n" +
+             "Custom Event for the police trainer, wired to FinishBriefing below.")]
+    [SerializeField] private FinalButtonAction finalButtonAction = FinalButtonAction.PlayPovReplay;
+
+    /// <summary>The text on that button.</summary>
+    [SerializeField] private string finalButtonLabel = "See what she saw";
+
+    /// <summary>
+    /// Runs when the button is pressed, if the action is Custom Event.
+    /// For the trainer, wire this to ScenarioDirector.FinishBriefing().
+    /// </summary>
+    [SerializeField] private UnityEngine.Events.UnityEvent onFinalButton;
 
     [Tooltip("Which subject to replay. Leave empty to use the NpcSubject on this object.")]
     [SerializeField] private NpcSubject subject;
 
     public string SpeakerName => speakerName;
     public int LineCount => lines != null ? lines.Length : 0;
-    public bool OfferPovReplay => offerPovReplay && Subject != null;
-    public string PovButtonLabel => povButtonLabel;
+    public string PovButtonLabel => finalButtonLabel;
+
+    /// <summary>
+    /// Whether the last page should show its extra button. A POV replay also needs a
+    /// subject to replay, so that case checks for one.
+    /// </summary>
+    public bool OfferPovReplay => finalButtonAction switch
+    {
+        FinalButtonAction.PlayPovReplay => Subject != null,
+        FinalButtonAction.CustomEvent => true,
+        _ => false
+    };
 
     public NpcSubject Subject
     {
@@ -78,10 +109,20 @@ public class DialogueSequence : MonoBehaviour
     }
 
     /// <summary>
-    /// Called by the dialogue panel's POV button.
+    /// Called when the player presses the button on the last page.
+    /// Does whatever Final Button Action is set to.
     /// </summary>
     public void PlayPovReplay()
     {
-        if (Subject != null) Subject.PlayTheirReplay();
+        switch (finalButtonAction)
+        {
+            case FinalButtonAction.PlayPovReplay:
+                if (Subject != null) Subject.PlayTheirReplay();
+                break;
+
+            case FinalButtonAction.CustomEvent:
+                onFinalButton?.Invoke();
+                break;
+        }
     }
 }

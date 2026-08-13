@@ -111,6 +111,9 @@ public class NpcSubject : MonoBehaviour, IInteractable
         {
             if (director == null) return true;
 
+            // The police trainer in the briefing works exactly like anyone else you talk to
+            if (director.Phase == GamePhase.Briefing) return availableInFreeRoam;
+
             if (director.Phase == GamePhase.FreeRoam) return availableInFreeRoam;
 
             // Only the driver himself is clickable once you're sitting in the car.
@@ -158,7 +161,10 @@ public class NpcSubject : MonoBehaviour, IInteractable
         // street, and sitting beside him in the car. The POV replay is reached from the
         // dialogue's last page, never directly — the director sends you back to whichever
         // of the two you started from.
-        if (director.Phase == GamePhase.FreeRoam || director.Phase == GamePhase.PassengerSeat)
+        // The police trainer in the briefing is the third case, and works identically.
+        if (director.Phase == GamePhase.Briefing ||
+            director.Phase == GamePhase.FreeRoam ||
+            director.Phase == GamePhase.PassengerSeat)
         {
             if (dialogue != null && UIManager.Instance != null)
             {

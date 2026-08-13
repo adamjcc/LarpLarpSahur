@@ -591,6 +591,9 @@ public class UIManager : MonoBehaviour
 
         switch (phase)
         {
+            case GamePhase.Briefing:
+                return "[WASD] Move     [LMB] Talk to your officer";
+
             case GamePhase.Observe:
                 return director.IsObservationPlaying ? "" : "[ENTER] Continue";
 
@@ -621,6 +624,7 @@ public class UIManager : MonoBehaviour
 
     private string TitleFor(GamePhase phase) => phase switch
     {
+        GamePhase.Briefing      => "BRIEFING",
         GamePhase.Observe       => "WHAT HAPPENED",
         GamePhase.FreeRoam      => "INVESTIGATE",
         GamePhase.PovReplay     => "",
@@ -634,6 +638,7 @@ public class UIManager : MonoBehaviour
     private string HintFor(GamePhase phase) => phase switch
     {
         // Description only. The keys live on the controls line underneath.
+        GamePhase.Briefing      => "Find your training officer",
         GamePhase.Observe       => "Watch the incident from above",
         GamePhase.FreeRoam      => "Examine the scene and talk to both people",
         GamePhase.PovReplay     => "",
