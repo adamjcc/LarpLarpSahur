@@ -84,6 +84,20 @@ public class CompanionBrain : MonoBehaviour
     /// <summary>How quickly it turns to face the player.</summary>
     [SerializeField] private float turnSpeed = 5f;
 
+    /// <summary>
+    /// Corrects a model whose "front" is not its +Z axis.
+    ///
+    /// The script always turns this object so that +Z points at the player, because that is
+    /// Unity's convention. If the robot was modelled facing up or sideways, it will look
+    /// tipped over. This offset is added on top, so you can fix it without touching the
+    /// model — try -90 or 90 in X, or 180 in Y, until it sits upright.
+    ///
+    /// Only needed when the model and the NavMeshAgent share one GameObject. If the model
+    /// is a separate child, rotate the child instead and leave this at zero.
+    /// </summary>
+    [Tooltip("Fixes a model whose front is not +Z. Try X -90, X 90, or Y 180.")]
+    [SerializeField] private Vector3 modelRotationOffset;
+
     [Header("Read-only")]
     [SerializeField] private CompanionState state = CompanionState.Idle;
 
@@ -208,8 +222,10 @@ public class CompanionBrain : MonoBehaviour
     {
         if (toPlayer.sqrMagnitude < 0.01f) return;
 
-        transform.rotation = Quaternion.Slerp(transform.rotation,
-                                              Quaternion.LookRotation(toPlayer),
+        // Face the player, then apply the model's own correction on top
+        Quaternion facing = Quaternion.LookRotation(toPlayer) * Quaternion.Euler(modelRotationOffset);
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, facing,
                                               turnSpeed * Time.deltaTime);
     }
 
