@@ -172,6 +172,10 @@ public class ScenarioDirector : MonoBehaviour
 
     private void Awake()
     {
+        // Remember which scene we started in, so the briefing can borrow the active slot
+        // for its lighting and then give it straight back.
+        mainScene = SceneManager.GetActiveScene();
+
         if (runner == null) runner = FindFirstObjectByType<ScenarioRunner>();
         if (settings == null) settings = FindFirstObjectByType<ScenarioSettings>();
         if (interventions == null) interventions = FindFirstObjectByType<InterventionState>();
@@ -205,6 +209,9 @@ public class ScenarioDirector : MonoBehaviour
     // True while Start Office is loaded on top of this scene
     private bool briefingLoaded;
 
+    // The main scene, remembered so the office can hand the active slot back on the way out
+    private Scene mainScene;
+
     /// <summary>
     /// Loads the police office alongside this scene, then puts the player inside it.
     ///
@@ -229,6 +236,15 @@ public class ScenarioDirector : MonoBehaviour
             yield return SceneManager.LoadSceneAsync(briefingSceneName, LoadSceneMode.Additive);
             briefingLoaded = true;
         }
+
+        // Hand the office the ACTIVE scene slot.
+        //
+        // Only the active scene's lighting counts: its skybox, its ambient light and its
+        // baked lightmap settings. Leaving GameScene active meant the classroom was being
+        // lit by the outdoor sunset from the street level, which is what produced those
+        // long soft shadows across the back wall.
+        Scene office = SceneManager.GetSceneByName(briefingSceneName);
+        if (office.IsValid() && office.isLoaded) SceneManager.SetActiveScene(office);
 
         // The marker lives in the office scene, so it can only be found once that scene
         // has finished loading. Cross-scene references are not allowed in the Inspector.
@@ -266,6 +282,10 @@ public class ScenarioDirector : MonoBehaviour
         if (!briefingLoaded) return;
 
         briefingLoaded = false;
+
+        // Give the active slot back to the main scene BEFORE unloading, so its lighting
+        // returns and Unity is never left without an active scene mid-unload.
+        if (mainScene.IsValid() && mainScene.isLoaded) SceneManager.SetActiveScene(mainScene);
 
         Scene scene = SceneManager.GetSceneByName(briefingSceneName);
         if (scene.isLoaded) SceneManager.UnloadSceneAsync(scene);
