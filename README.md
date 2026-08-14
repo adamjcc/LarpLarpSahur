@@ -326,8 +326,8 @@ These choices kept the experience clear, repeatable and suitable for a short cla
 | Cinemachine, AI Navigation, Input System, Timeline and Universal RP | Unity Technologies, Unity Companion License                                                                                                      | Cameras, navigation, input, sequences and rendering |
 | Headphones Model                                                    | [User "~Drift~" on Sketchfab](https://skfb.ly/oRFAr), licensed under [Creative Commons Attribution](http://creativecommons.org/licenses/by/4.0/) | The student's noise-cancelling headphones           |
 | Low Poly Mobile Phone                                               | [User "kimmy.k" on Sketchfab](https://skfb.ly/owJHu), licensed under [Creative Commons Attribution](http://creativecommons.org/licenses/by/4.0/) | The student's phone                                 |
-| Car model with separated interior parts                             | 🔲 _add source link and author_                                                                                                                  | The car involved in the collision                   |
-| Environment and prop packs                                          | 🔲 _add source and licence for the city pack, skybox, ground materials and fonts_                                                                | Level environment and interface                     |
+| Car model with separated interior parts                             | [Sketchfab by user scailman](https://sketchfab.com/3d-models/low-poly-small-car-ebe7c5e98a7448b5abb2eaf0cb22b766)                                | The car involved in the collision                   |
+| Environment and prop packs                                          | Unity Mega Furniture Pack on Unity Asset Store                                                                                                   | Level environment and interface                     |
 
 The full asset list, exact source links and licence records are kept in `Docs/CREDITS.md`.
 
