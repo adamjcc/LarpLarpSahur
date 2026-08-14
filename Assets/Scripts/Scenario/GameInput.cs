@@ -53,13 +53,12 @@ public class GameInput : MonoBehaviour
             : Input.GetMouseButtonDown(0);
 
     /// <summary>
-    /// Q / right mouse / gamepad B — leave a seat or a point of view.
+    /// Escape / right mouse / gamepad B — leave a seat, a point of view or a panel.
     /// </summary>
     public static bool BackPressed =>
         Instance != null
             ? Instance.backFrame == Time.frameCount
-            : Input.GetKeyDown(KeyCode.Q) || Input.GetMouseButtonDown(1) ||
-              Input.GetKeyDown(KeyCode.Escape);
+            : Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1);
 
     /// <summary>
     /// Enter / gamepad Start — advance to the next part.

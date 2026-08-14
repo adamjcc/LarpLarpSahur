@@ -602,15 +602,15 @@ public class UIManager : MonoBehaviour
 
             case GamePhase.PassengerSeat:
                 return canHideObstruction
-                    ? "[LMB] Examine     [F] Hide the wheel     [Q] Get out"
-                    : "[LMB] Examine     [Q] Get out";
+                    ? "[LMB] Examine     [F] Hide the wheel     [ESC] Get out"
+                    : "[LMB] Examine     [ESC] Get out";
 
             case GamePhase.Intervene:
                 if (director.IsInNpcView)
                 {
                     return canHideObstruction
-                        ? "[LMB] Change     [F] Hide the wheel     [Q] Step back out"
-                        : "[LMB] Change     [Q] Step back out";
+                        ? "[LMB] Change     [F] Hide the wheel     [ESC] Step back out"
+                        : "[LMB] Change     [ESC] Step back out";
                 }
                 return "[WASD] Move     [LMB] Step into their view";
 

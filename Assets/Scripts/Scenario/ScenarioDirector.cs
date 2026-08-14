@@ -80,8 +80,8 @@ public class ScenarioDirector : MonoBehaviour
     [SerializeField] private string briefingSceneName = "Start Office";
 
     [Header("Options")]
+    /// <summary>Opens the main menu on Play. Untick only to test a phase in isolation.</summary>
     [SerializeField] private bool startAutomatically = true;
-    [SerializeField] private bool debugKeys = true;
 
     [Header("Read-only")]
     [SerializeField] private GamePhase phase = GamePhase.Boot;
@@ -614,7 +614,7 @@ public class ScenarioDirector : MonoBehaviour
                 break;
         }
 
-        if (debugKeys) HandleDebugKeys();
+        HandlePlayerInput();
     }
 
     // =====================================================================
@@ -732,51 +732,37 @@ public class ScenarioDirector : MonoBehaviour
     }
 
     // =====================================================================
-    //  TEMPORARY KEYS FOR PART 3. Real UI buttons replace these in Part 5.
+    //  PLAYER INPUT
     //
-    //  The bottom letter row, left to right, follows the order of the game:
-    //      Z observe   X free roam   C her POV   V his POV
-    //      B passenger seat   N intervene   M resolve   K debrief
-    //
-    //  Deliberately NOT the F-keys (Unity steals some) and NOT Space
-    //  (Starter Assets uses it to jump).
+    //  Only the two inputs the player actually uses. The phase-jump shortcuts that were
+    //  here during development have been removed now that the menu and the UI buttons
+    //  cover the whole flow.
     // =====================================================================
-    private void HandleDebugKeys()
+    private void HandlePlayerInput()
     {
-        // A panel owns Enter, Q, Escape and right-click while it is open, and for the rest
-        // of the frame it closes on. Without the frame part, pressing Q to dismiss a
+        // A panel owns Enter, Escape and right-click while it is open, and for the rest of
+        // the frame it closes on. Without the frame part, pressing Escape to dismiss a
         // dialogue would ALSO eject you from the passenger seat, depending on which script
         // Unity happened to update first.
         if (UIManager.ModalBlockingInput) return;
 
-        if (Input.GetKeyDown(KeyCode.G)) EnterPhase(GamePhase.Briefing);
-        if (Input.GetKeyDown(KeyCode.Z)) EnterPhase(GamePhase.Observe);
-        if (Input.GetKeyDown(KeyCode.X)) EnterPhase(GamePhase.FreeRoam);
-        if (Input.GetKeyDown(KeyCode.C)) PlayPovReplay(CameraId.PedestrianPov);
-        if (Input.GetKeyDown(KeyCode.V)) PlayPovReplay(CameraId.DriverPov);
-        if (Input.GetKeyDown(KeyCode.B)) EnterPhase(GamePhase.PassengerSeat);
-        if (Input.GetKeyDown(KeyCode.N)) EnterPhase(GamePhase.Intervene);
-        if (Input.GetKeyDown(KeyCode.M)) EnterPhase(GamePhase.Resolve);
-        if (Input.GetKeyDown(KeyCode.K)) EnterPhase(GamePhase.Debrief);
-
-        // "Continue" = Enter or gamepad Start, so you can walk the whole loop with one input
+        // "Continue" = Enter or gamepad Start
         if (GameInput.ContinuePressed)
         {
             switch (phase)
             {
-                case GamePhase.Observe:       FinishObserving();    break;
+                case GamePhase.Observe:       FinishObserving();          break;
                 case GamePhase.FreeRoam:      RequestBeginIntervention(); break;
-                case GamePhase.PassengerSeat: LeavePassengerSeat(); break;
-                case GamePhase.Debrief:       RetryFromStart();     break;
+                case GamePhase.PassengerSeat: LeavePassengerSeat();       break;
+                case GamePhase.Debrief:       RetryFromStart();           break;
             }
         }
 
-        // Back out of whatever you stepped into. Bound to Q, right mouse and gamepad B.
+        // "Back" = Escape, right mouse or gamepad B.
         //
-        // Escape is deliberately NOT bound. The Unity Editor grabs Escape itself and
-        // force-releases the cursor lock, so our code re-locks it and the Editor unlocks it
-        // again — which is why it used to leave a stray cursor. Editor-only, but no reason
-        // to fight it.
+        // Note for testing: the Unity EDITOR also grabs Escape and releases the cursor
+        // lock, so in the Editor you may need to click the Game view again afterwards.
+        // This does not happen in a built player.
         if (GameInput.BackPressed)
         {
             if (npcViewActive) ExitNpcView();

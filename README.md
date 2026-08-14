@@ -96,7 +96,7 @@ The investigation has no timer. The countdown only begins during the interventio
 | `Left Shift`                | Left trigger | Sprint                                             |
 | `Space`                     | A            | Jump                                               |
 | `Left Mouse Button` or `E`  | A            | Examine, speak or interact                         |
-| `Q` or `Right Mouse Button` | B            | Leave a point-of-view camera or the passenger seat |
+| `Escape` or `Right Mouse Button` | B       | Leave a point-of-view camera, the passenger seat or a panel |
 | `F`                         | Y            | Hide the steering wheel while in the driver's seat |
 | `Enter`                     | Start        | Continue to the next part of the experience        |
 
@@ -104,7 +104,7 @@ All controls are defined in a Unity Input Action Asset, so keyboard, mouse and g
 
 The same crosshair is used while walking, sitting inside the car and viewing the scene through another person's eyes. It changes appearance the moment it lands on something interactive, and objects brighten when the player is close enough to use them.
 
-The driver sits close to the wheel, so the steering wheel and indicator stalk block the view of the pedals. `F` hides them while the player is in the driver's seat and restores them automatically on the way out.
+The driver sits close to the wheel, so the steering wheel and indicator stalk block the view of the pedals. The player can click the steering column to hide them, or press `F`, and either way they are restored automatically on the way out of the seat.
 
 Before the intervention begins, a confirmation box explains what is about to happen and warns that the investigation cannot be returned to.
 
@@ -296,7 +296,7 @@ The final build was checked using the following tests:
 
 No game-breaking issues were found in the final standalone build.
 
-When testing inside the Unity Editor, pressing Escape may release the mouse cursor until the Game view is clicked again. This is Editor behaviour and does not occur in the standalone build. `Q` or Right Mouse Button can also be used to leave a point-of-view camera.
+When testing inside the Unity Editor, pressing Escape may release the mouse cursor until the Game view is clicked again. This is Editor behaviour and does not occur in the standalone build. Right Mouse Button can also be used to leave a point-of-view camera.
 
 Loose parts thrown from the car and the pedestrian's ragdoll use real physics, so they land slightly differently on each replay. This is deliberate — both only ever run after the outcome has already been decided.
 

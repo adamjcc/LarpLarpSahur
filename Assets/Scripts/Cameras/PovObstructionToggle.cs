@@ -59,6 +59,9 @@ public class PovObstructionToggle : MonoBehaviour
         if (director == null) director = FindFirstObjectByType<ScenarioDirector>();
     }
 
+    /// <summary>True while the obstructions are currently hidden.</summary>
+    public bool IsHidden => obstructionsHidden;
+
     private void Update()
     {
         if (!IsAvailable)
@@ -69,7 +72,15 @@ public class PovObstructionToggle : MonoBehaviour
             return;
         }
 
-        if (GameInput.ToggleViewPressed) SetHidden(!obstructionsHidden);
+        if (GameInput.ToggleViewPressed) Toggle();
+    }
+
+    /// <summary>
+    /// Flips between hidden and shown. Called by the key and by clicking the wheel.
+    /// </summary>
+    public void Toggle()
+    {
+        SetHidden(!obstructionsHidden);
     }
 
     private void SetHidden(bool hidden)
